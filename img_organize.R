@@ -10,7 +10,7 @@ library(dplyr)
 
 
 imgDir <- "/media/hkropp/research/Kolyma_Data/georef_img"
-
+extDir <- "/media/hkropp/research/Kolyma_Data/polygon_laea"
 
 imgList <- c("A006_c.tif","a006_d.tif",
              "A007_ct3.tif","A007_d.tif",
@@ -26,3 +26,6 @@ for(i in 1:length(imgList)){
 
 plot(imgR[[1]], col=grey(1:100/100))
 imgR[[1]]@ptr$res
+
+polyC <- vect(paste0(extDir, "/A006_c.shp"))
+crs(polyC)
