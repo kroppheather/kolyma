@@ -22,7 +22,7 @@ extList <- c("A006_c.shp","A006_d.shp",
              "A007_c.shp","A007_d.shp",
              "A008_c.shp","A008_d.shp",
              "A009_c.shp","A009_d.shp",
-             "A010_b.shp", "A010_c.shp","A010_d.shp")
+             "A010_b.shp", "A010_c.shp","A010_d_fix.shp")
 # read in raster images.
 imgR <- list()
 for(i in 1:length(imgList)){
@@ -51,10 +51,12 @@ for(i in 1:length(extList)){
   
 }
   
-  
-  
-plot(imgRrp, col=grey(1:100/100))
-imgRrp@ptr$res
+imgC[[11]] <- mask(imgRrp[[11]], polyC[[11]]) 
+N <- 11  
+plot(imgC[[N]], col=grey(1:100/100))
+imgC[[N]]@ptr$res
+
+
 imgR[[1]]@ptr$res
 crs(imgR[[1]])
 ext(imgRrp)
