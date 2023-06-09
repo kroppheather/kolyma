@@ -18,7 +18,7 @@ imgList <- c("A006_c.tif","a006_d.tif",
              "A009_c.tif","A009_d.tif",
              "A010_b.tif", "A010_c.tif","A010_d.tif")
 
-extList <- c("A006_c.shp","a006_d.shp",
+extList <- c("A006_c.shp","A006_d.shp",
              "A007_c.shp","A007_d.shp",
              "A008_c.shp","A008_d.shp",
              "A009_c.shp","A009_d.shp",
@@ -33,12 +33,26 @@ plot(imgR[[1]], col=grey(1:100/100))
 
 # read in polygons that give the extent of usuable space in an image
 
-imgR[[1]]@ptr$res
-for(i in 1:length(extList))
-polyC <- vect(paste0(extDir, "/A006_c.shp"))
-crs(polyC)
+polyC <- list()
+for(i in 1:length(extList)){
+  polyC[[i]] <- vect(paste0(extDir, "/", extList[i]))
+}
 
-imgRrp <- project(imgR[[1]], crs(polyC), method="bilinear")
+imgRrp <- list()
+
+for(i in 1:length(extList)){
+  imgRrp[[i]] <- project(imgR[[i]], crs(polyC[[i]]), method="bilinear")
+}
+
+# mask raster images to keep only the extent to use
+imgC <- list()
+for(i in 1:length(extList)){
+  imgC[[i]] <- mask(imgRrp[[i]], polyC[[i]])
+  
+}
+  
+  
+  
 plot(imgRrp, col=grey(1:100/100))
 imgRrp@ptr$res
 imgR[[1]]@ptr$res
