@@ -50,19 +50,12 @@ for(i in 1:length(extList)){
   imgC[[i]] <- mask(imgRrp[[i]], polyC[[i]])
   
 }
-  
-imgC[[11]] <- mask(imgRrp[[11]], polyC[[11]]) 
-N <- 11  
-plot(imgC[[N]], col=grey(1:100/100))
-imgC[[N]]@ptr$res
+plot(imgC[[11]], col=grey(1:100/100))
+for(i in 1:length(extList)){
+  writeRaster(imgC[[i]], paste0("/media/hkropp/research/Kolyma_Data/trim_imgs/",imgList[i]  ))
+}
 
 
-imgR[[1]]@ptr$res
-crs(imgR[[1]])
-ext(imgRrp)
-imgTest1 <- crop(imgRrp, ext(24600,24950, -2345600,-2345400))
-plot(imgTest1, col=grey(1:100/100), maxcell=ncell(imgTest1))
-imgTest2 <- crop(imgR[[1]], ext(17989600,17990300,10710500,10711000))
-plot(imgTest2, col=grey(1:100/100), maxcell=ncell(imgTest2))
-
+# empty raster to resample
+# top coordinate
 
