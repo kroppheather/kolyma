@@ -7,7 +7,7 @@
 library(terra)
 library(dplyr)
 
-dirD <- "/media/studentuser/Seagate Portable Drive/training"
+dirD <- "/media/studentuser/PATRIOT/training"
 
 img <- list.files(paste0(dirD, "/img"),pattern=".tif")
 imgXML <- grepl(".aux.xml",img)
@@ -29,6 +29,10 @@ poly <- list.files(paste0(dirD, "/masks/polygonal"),pattern=".shp")
 polyXML <- grepl(".xml",poly)
 poly <- poly[polyXML == FALSE ]
 
+lowDensity <- list.files(paste0(dirD, "/masks/low_density"),pattern=".shp")
+lowDensityXML <- grepl(".xml",lowDensity)
+lowDensity <- lowDensity[lowDensityXML == FALSE ] 
+
 imgNumber <- as.numeric(gsub("\\D","", img))
 waterNumber <- as.numeric(gsub("\\D","", water))
 waterName <- gsub(".shp", ".tif",water)
@@ -38,6 +42,8 @@ polyNumber <- as.numeric(gsub("\\D","", poly))
 polyName <- gsub(".shp", ".tif", poly)
 treesNumber <- as.numeric(gsub("\\D","", trees))
 treesName <- gsub(".shp", ".tif", trees)
+lowDensityNumber <- as.numeric(gsub("\\D","", lowDensity))
+lowDensityName <- gsub(".shp", ".tif", lowDensity)
 
 imgL <- list()
 for(i in 1:length(img)){
@@ -61,11 +67,8 @@ for(i in 1:length(water)){
 }
 
 for(i in 1:length(water)){
-  writeRaster(waterR[[i]], paste0("/media/studentuser/Seagate Portable Drive/training/masks_img/water_img/", waterName[i] ))
+  writeRaster(waterR[[i]], paste0("/media/studentuser/PATRIOT/training/masks_img/water_img/", waterName[i] ))
 }
-
-
-
 
 shrubL <- list()
 for(i in 1:length(shrubs)){
@@ -84,11 +87,8 @@ plot(shrubL[[2]])
 plot(shrubR[[2]], add=TRUE, alpha=0.5)
 
 for(i in 1:length(shrubs)){
-  writeRaster(shrubR[[i]], paste0("/media/studentuser/Seagate Portable Drive/training/masks_img/shrubs_img/", shrubName[i] ))
+  writeRaster(shrubR[[i]], paste0("/media/studentuser/PATRIOT/training/masks_img/shrubs_img/", shrubName[i] ))
 }
-
-
-
 
 polyL <- list()
 for(i in 1:length(poly)){
@@ -107,7 +107,7 @@ plot(polyL[[2]])
 plot(polyR[[2]], alpha=0.5)
 
 for(i in 1:length(poly)){
-  writeRaster(polyR[[i]], paste0("/media/studentuser/Seagate Portable Drive/training/masks_img/polygonal_img/", polyName[i] ))
+  writeRaster(polyR[[i]], paste0("/media/studentuser/PATRIOT/training/masks_img/polygonal_img/", polyName[i] ))
 }
 
 
@@ -128,5 +128,24 @@ plot(treesL[[2]])
 plot(treesR[[2]], add=TRUE, alpha=0.5)
 
 for(i in 1:length(trees)){
-  writeRaster(treesR[[i]], paste0("/media/studentuser/Seagate Portable Drive/training/masks_img/trees_img/", treesName[i] ))
+  writeRaster(treesR[[i]], paste0("/media/studentuser/PATRIOT/training/masks_img/trees_img/", treesName[i] ))
+}
+
+
+
+lowDensityL <- list()
+for(i in 1:length(lowDensity)){
+  lowDensityL[[i]] <- vect(paste0(dirD, "/masks/low_density/",lowDensity[i]))
+}  
+
+imgPos <- numeric()
+lowDensityR <- list()
+
+for(i in 1:length(lowDensity)){
+  imgPos <- which(imgNumber == lowDensityNumber[i])
+  lowDensityR[[i]] <- rasterize(lowDensityL[[i]], imgL[[imgPos]], background=0)
+}
+
+for(i in 1:length(lowDensity)){
+  writeRaster(lowDensityR[[i]], paste0("/media/studentuser/PATRIOT/training/masks_img/low_density_img/", lowDensityName[i] ))
 }
