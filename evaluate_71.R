@@ -5,7 +5,7 @@ library(dplyr)
 
 # directory 
 dir <-"/media/studentuser/Seagate Portable Drive/training/"
-dirV <- "/media/studentuser/Seagate Portable Drive/predictions_71/valid"
+dirV <- "/media/studentuser/Seagate Portable Drive/predictions_71/kernalmodel/valid"
 dirM <- "/media/studentuser/Seagate Portable Drive/training/masks_img"
 # images 13 and 175 are skipped
 

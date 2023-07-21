@@ -1,13 +1,12 @@
-library(rast)
-library(sf)
-library(mapview)
+library(terra)
+library(dplyr)
 
 
 # Image merge ---------
 
-dirP <- "/media/studentuser/Seagate Portable Drive/predicitons_71/all"
+dirP <- "/media/studentuser/Seagate Portable Drive/predictions_71/kernalmodel/all"
 
-Nimg <- 1740
+Nimg <- 19825
 
 
 treeImg <- list()
@@ -53,38 +52,24 @@ for(i in 1:Nimg){
 lowDAll <- do.call(merge, lowDImg)
 
 
-# get maximum prob
-treeLayer <- calc(treeAll, function(x){max(x, na.rm=TRUE)})
-plot(treeLayer)
-
-waterLayer <- calc(waterAll, function(x){max(x, na.rm=TRUE)})
-plot(waterLayer)
-
-shrubLayer <- calc(shrubAll, function(x){max(x, na.rm=TRUE)})
-plot(shrubLayer)
-
-lowDLayer <- calc(lowDAll, function(x){max(x, na.rm=TRUE)})
-plot(lowDLayer)
-
-
 # Make final map cover -------------
 
 # remove noise below set threshold
 
 threshold <- 0.2
 
-treeMap <- ifel(treeLayer <= threshold, 0, x)
-waterMap <- ifel(waterLayer <= threshold, 0, x)
-shrubMap <- ifel(shrubLayer <= threshold, 0, x)
-lowDMap <- ifel(lowDLayer <= threshold, 0, x)
+treeMap <- ifel(treeAll <= threshold, 0, treeAll)
+waterMap <- ifel(waterAll <= threshold, 0, waterAll)
+shrubMap <- ifel(shrubAll <= threshold, 0, shrubAll)
+lowDMap <- ifel(lowDAll <= threshold, 0, lowDAll)
 
 
 # binary map of above
 
-treeMapB <- ifel(treeLayer <= threshold, 0, 1)
-waterMapB <- ifel(waterLayer <= threshold, 0, 1)
-shrubMapB <- ifel(shrubLayer <= threshold, 0, 1)
-lowDMapB <- ifel(lowDLayer <= threshold, 0, 1)
+treeMapB <- ifel(treeAll <= threshold, 0, 1)
+waterMapB <- ifel(waterAll <= threshold, 0, 1)
+shrubMapB <- ifel(shrubAll <= threshold, 0, 1)
+lowDMapB <- ifel(lowDAll <= threshold, 0, 1)
 
 binaryStack <- c(treeMapB,waterMapB,shrubMapB,lowDMapB)
 
@@ -92,14 +77,11 @@ binaryStack <- c(treeMapB,waterMapB,shrubMapB,lowDMapB)
 # need to filter so only one class for each pixel
 # take the highest probability
 
-coverStack <- c(treeMap, waterMapB, shrubMapB, lowDMapB)
+coverStack <- c(treeMap, waterMap, shrubMap, lowDMap)
 
-which.max2 <- function(x){
-  max_idx <- which.max(x)   # Get the max
-  ifel(length(max_idx)== 0,return(NA),return(max_idx))
-}
+classR <- which.max(coverStack)
 
-classR <- calc(coverStack, which.max2)
+plot(coverStack)
 
 #now need to make a rule for determining if the class has a high enough threshold
 # need to muliply by binary so turns to zero if too low
@@ -130,11 +112,12 @@ shrubClass2 <- shrubClass*3
 lowDClass2 <- lowDClass*4
 
 # other will be zero, trees =1, buildings =2, pavement =3
-finalClass <- treeClass+buildClass2+paveClass2
+finalClass <- treeClass+waterClass2+shrubClass2+lowDClass2
 
 plot(finalClass)
 
 
 
 
-writerast(finalClass, "/media/studentuser/Seagate Portable Drive/predicitons_71/all/finalClass.tif", format="GTiff" )
+writeRaster(finalClass, paste0(dirP, "/finalmodel.tif"), filetype="GTiff" )
+
