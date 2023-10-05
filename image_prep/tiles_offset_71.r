@@ -1,7 +1,7 @@
 
 library(terra)
 library(dplyr)
-library(mapview)
+
 
 
 imgDir <- "/media/hkropp/research/Kolyma_Data"
@@ -22,5 +22,5 @@ colsi <- ncol(img_final)
 ext_tile2 <- img_final[25:rowsi,25:colsi]
 ext_tile3 <- img_final[50:rowsi,50:colsi]
 
-tileI2 <- makeTiles(ext_tile2, c(256,256), "/media/hkropp/research/Kolyma_Data/u_net71/tiles_256_2/img.tif", na.rm=TRUE)
-tileI3 <- makeTiles(ext_tile3, c(256,256), "/media/hkropp/research/Kolyma_Data/u_net71/tiles_256_3/img.tif", na.rm=TRUE)
+tileI2 <- makeTiles(ext_tile2, c(256,256), "/media/hkropp/research/Kolyma_Data/img_tiles/1971/tiles_256_2/img.tif", na.rm=TRUE)
+tileI3 <- makeTiles(ext_tile3, c(256,256), "/media/hkropp/research/Kolyma_Data/img_tiles/1971/tiles_256_3/img.tif", na.rm=TRUE)
