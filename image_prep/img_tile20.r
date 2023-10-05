@@ -67,3 +67,36 @@ for(i in 1:nrow(tilepairs)){
 
 
 tileI <- makeTiles(img, c(256,256), "K:/Environmental_Studies/hkropp/Private/siberia_wv/Kolyma/u_net20/img_256/img.tif")
+
+
+
+# add additional stratified sampling for the low density area
+
+
+
+img <- rast("/media/hkropp/research/Kolyma_Data/imagery_20/wv8b_07_20.tif")
+stratE <- vect("/media/hkropp/research/Kolyma_Data/low_density_e/low_density_ex.shp")
+
+imgLE <- crop(img,stratE)
+
+
+set.seed(25)
+rowsi <- sample(1:(nrow(imgLE )-255), 25)
+set.seed(4)
+colsi <- sample(1:(ncol(imgLE )-255), 25)
+training.samples <- list()
+training.check <- numeric()
+for(i in 1:25){
+  training.samples[[i]] <-  imgLE[rowsi[i]:(rowsi[i]+255), colsi[i]:(colsi[i]+255), drop=FALSE]
+  # create a check to remove any training samples with NAs
+  training.check[i] <- ifelse(sum(values(training.samples[[i]],mat=FALSE)) == 0,0,1)
+}
+
+
+training.valid <- which(training.check == 1)
+
+
+
+for(i in 1:25){
+  writeRaster(training.samples[[i]], paste0("media/hkropp/research/Kolyma_Data/u_net20/training/img_strat/img_",i+200,".tif"))
+} 
