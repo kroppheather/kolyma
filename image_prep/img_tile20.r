@@ -98,5 +98,5 @@ training.valid <- which(training.check == 1)
 
 
 for(i in 1:25){
-  writeRaster(training.samples[[i]], paste0("media/hkropp/research/Kolyma_Data/u_net20/training/img_strat/img_",i+200,".tif"))
+  writeRaster(training.samples[[i]], paste0("/media/hkropp/research/Kolyma_Data/training/Kolyma/u_net20/training/img_strat/img_",i+200,".tif"))
 } 

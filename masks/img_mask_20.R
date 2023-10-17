@@ -7,25 +7,25 @@
 library(terra)
 library(dplyr)
 
-dirD <- "/media/hkropp/research/Kolyma_Data/training/Kolyma/u_net20/shapefiles"
+dirD <- "/media/hkropp/research/Kolyma_Data/training/Kolyma/u_net20"
 # names of all shapefiles
-img <- list.files(paste0(dirD, "/img"),pattern=".tif")
+img <- list.files(paste0(dirD, "/training/img"),pattern=".tif")
 imgXML <- grepl(".aux.xml",img)
 img <- img[imgXML == FALSE ] 
 
-water <- list.files(paste0(dirD, "/water"),pattern=".shp")
+water <- list.files(paste0(dirD, "/shapefiles/shapefiles/water"),pattern=".shp")
 waterXML <- grepl(".xml",water)
 water <- water[waterXML == FALSE ] 
 
-shrubs <- list.files(paste0(dirD, "/shrub"),pattern=".shp")
+shrubs <- list.files(paste0(dirD, "/shapefiles/shapefiles/shrub"),pattern=".shp")
 shrubsXML <- grepl(".xml",shrubs)
 shrubs <- shrubs[shrubsXML == FALSE ] 
 
-trees <- list.files(paste0(dirD, "/tree"),pattern=".shp")
+trees <- list.files(paste0(dirD, "/shapefiles/shapefiles/tree"),pattern=".shp")
 treesXML <- grepl(".xml",trees)
 trees <- trees[treesXML == FALSE ] 
 
-low <- list.files(paste0(dirD, "/low"),pattern=".shp")
+low <- list.files(paste0(dirD, "/shapefiles/shapefiles/low"),pattern=".shp")
 lowXML <- grepl(".xml",low)
 low <- low[lowXML == FALSE ] 
 
@@ -44,14 +44,14 @@ lowName <- gsub(".shp", ".tif", low)
 # read in all images
 imgL <- list()
 for(i in 1:length(img)){
-  imgL[[i]] <- rast(paste0(dirD,"/img/",img[i]))
+  imgL[[i]] <- rast(paste0(dirD,"/training/img/",img[i]))
   
 }
 #### Water ----
 # read in shapefiles
 waterL <- list()
 for(i in 1:length(water)){
-  waterL[[i]] <- vect(paste0(dirD, "/water/",water[i]))
+  waterL[[i]] <- vect(paste0(dirD, "/shapefiles/shapefiles/water/",water[i]))
 }  
 
 # pull out the corresponding image and convert shapefile to raster
@@ -70,7 +70,7 @@ for(i in 1:length(water)){
 # read in shapefiles
 shrubL <- list()
 for(i in 1:length(shrubs)){
-  shrubL[[i]] <- vect(paste0(dirD, "/shrub/",shrubs[i]))
+  shrubL[[i]] <- vect(paste0(dirD, "/shapefiles/shapefiles/shrub/",shrubs[i]))
 }  
 
 # pull out the corresponding image and convert shapefile to raster
@@ -85,3 +85,21 @@ for(i in 1:length(shrubs)){
   writeRaster(shrubR[[i]], paste0("/media/hkropp/research/Kolyma_Data/training/Kolyma/u_net20/masks_img/shrub/", shrubName[i] ))
 }
 
+#### Tree ---
+# read in shapefiles
+treeL <- list()
+for(i in 1:length(shrubs)){
+  treeL[[i]] <- vect(paste0(dirD, "/shapefiles/shapefiles/tree/",trees[i]))
+}  
+
+# pull out the corresponding image and convert shapefile to raster
+imgPos <- numeric()
+shrubR <- list()
+for(i in 1:length(water)){
+  imgPos <- which(imgNumber == shrubNumber[i])
+  shrubR[[i]] <- rasterize(shrubL[[i]], imgL[[imgPos]], background=0)
+}
+
+for(i in 1:length(shrubs)){
+  writeRaster(shrubR[[i]], paste0("/media/hkropp/research/Kolyma_Data/training/Kolyma/u_net20/masks_img/shrub/", shrubName[i] ))
+}
