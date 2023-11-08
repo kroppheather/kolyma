@@ -6,8 +6,16 @@ library(dplyr)
 
 dirP <- "/media/hkropp/research/Kolyma_Data/predictions/2020"
 
-Nimg <- 19825
+Nimg <- 12144
 
+
+tiles <- list()
+for(i in 1:Nimg){
+  tiles[[i]] <- rast(paste0("/media/hkropp/research/Kolyma_Data/img_tiles/2020/tiles_256/img_",i,".tif"))
+  
+}
+
+plot(tiles[[1000]]$Blue)
 
 treeImg <- list()
 
@@ -19,6 +27,7 @@ for(i in 1:Nimg){
 
 treeAll <- do.call(merge, treeImg)
 
+test <- vrt(list.files(paste0(dirP,"/tree"), full.names=TRUE))
 
 waterImg <- list()
 
@@ -27,9 +36,23 @@ for(i in 1:Nimg){
   
   
 }
-
+testW <- vrt(list.files(paste0(dirP,"/water"), full.names=TRUE))
+plot(testW)
 waterAll <- do.call(merge, waterImg)
+waterTest <- waterAll[1:1000,1:1000,drop=FALSE]
+plot(treeAll)
+plot(tiles[[204]]$Blue)
+plot(waterImg[[204]])
+plot(tiles[[1000]]$Blue)
+plot(waterImg[[1000]])
 
+test <- merge(tiles[[204]],tiles[[205]],tiles[[206]],tiles[[207]],tiles[[208]],
+  tiles[[1000]], tiles[[1001]],tiles[[1002]],tiles[[1003]],tiles[[1004]], tiles[[3000]])
+plot(test$Blue)
+testW <- merge(waterImg[[204]],waterImg[[205]],waterImg[[206]],waterImg[[207]],waterImg[[208]],
+               waterImg[[1000]], waterImg[[1001]],waterImg[[1002]],waterImg[[1003]],waterImg[[1004]], waterImg[[3000]])
+
+plot(testW)
 
 shrubImg <- list()
 
@@ -44,7 +67,7 @@ shrubAll <- do.call(merge, shrubImg)
 lowDImg <- list()
 
 for(i in 1:Nimg){
-  lowDImg[[i]] <- rast(paste0(dirP,"/lowD/lowD_predict_",i,".tif"))
+  lowDImg[[i]] <- rast(paste0(dirP,"/low/lowD_predict_",i,".tif"))
   
   
 }
@@ -56,7 +79,7 @@ lowDAll <- do.call(merge, lowDImg)
 
 # remove noise below set threshold
 
-threshold <- 0.2
+threshold <- 0.1
 
 treeMap <- ifel(treeAll <= threshold, 0, treeAll)
 waterMap <- ifel(waterAll <= threshold, 0, waterAll)
@@ -71,7 +94,7 @@ waterMapB <- ifel(waterAll <= threshold, 0, 1)
 shrubMapB <- ifel(shrubAll <= threshold, 0, 1)
 lowDMapB <- ifel(lowDAll <= threshold, 0, 1)
 
-binaryStack <- c(treeMapB,waterMapB,shrubMapB,lowDMapB)
+
 
 
 # need to filter so only one class for each pixel
@@ -81,7 +104,7 @@ coverStack <- c(treeMap, waterMap, shrubMap, lowDMap)
 
 classR <- which.max(coverStack)
 
-plot(coverStack)
+plot(coverR)
 
 #now need to make a rule for determining if the class has a high enough threshold
 # need to muliply by binary so turns to zero if too low
