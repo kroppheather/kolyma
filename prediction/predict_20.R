@@ -51,7 +51,7 @@ shrubAll <- do.call(merge, shrubImg)
 
 lowDImg <- list()
 
-for(i in 1:Nimg){finalmodel
+for(i in 1:Nimg){
   lowDImg[[i]] <- rast(paste0(dirP,"/low/lowD_predict_",i,".tif"))
   
   
