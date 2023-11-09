@@ -36,23 +36,8 @@ for(i in 1:Nimg){
   
   
 }
-testW <- vrt(list.files(paste0(dirP,"/water"), full.names=TRUE))
-plot(testW)
+
 waterAll <- do.call(merge, waterImg)
-waterTest <- waterAll[1:1000,1:1000,drop=FALSE]
-plot(treeAll)
-plot(tiles[[204]]$Blue)
-plot(waterImg[[204]])
-plot(tiles[[1000]]$Blue)
-plot(waterImg[[1000]])
-
-test <- merge(tiles[[204]],tiles[[205]],tiles[[206]],tiles[[207]],tiles[[208]],
-  tiles[[1000]], tiles[[1001]],tiles[[1002]],tiles[[1003]],tiles[[1004]], tiles[[3000]])
-plot(test$Blue)
-testW <- merge(waterImg[[204]],waterImg[[205]],waterImg[[206]],waterImg[[207]],waterImg[[208]],
-               waterImg[[1000]], waterImg[[1001]],waterImg[[1002]],waterImg[[1003]],waterImg[[1004]], waterImg[[3000]])
-
-plot(testW)
 
 shrubImg <- list()
 
@@ -66,33 +51,34 @@ shrubAll <- do.call(merge, shrubImg)
 
 lowDImg <- list()
 
-for(i in 1:Nimg){
+for(i in 1:Nimg){finalmodel
   lowDImg[[i]] <- rast(paste0(dirP,"/low/lowD_predict_",i,".tif"))
   
   
 }
 
 lowDAll <- do.call(merge, lowDImg)
-
+plot(lowDAll)
+plot(shrubAll)
+plot(treeAll)
 
 # Make final map cover -------------
 
 # remove noise below set threshold
 
-threshold <- 0.1
 
-treeMap <- ifel(treeAll <= threshold, 0, treeAll)
-waterMap <- ifel(waterAll <= threshold, 0, waterAll)
-shrubMap <- ifel(shrubAll <= threshold, 0, shrubAll)
-lowDMap <- ifel(lowDAll <= threshold, 0, lowDAll)
+treeMap <- ifel(treeAll <= 0.1, 0, treeAll)
+waterMap <- ifel(waterAll <= 0.3, 0, waterAll)
+shrubMap <- ifel(shrubAll <= 0.15, 0, shrubAll)
+lowDMap <- ifel(lowDAll <= 0.1, 0, lowDAll)
 
 
 # binary map of above
 
-treeMapB <- ifel(treeAll <= threshold, 0, 1)
-waterMapB <- ifel(waterAll <= threshold, 0, 1)
-shrubMapB <- ifel(shrubAll <= threshold, 0, 1)
-lowDMapB <- ifel(lowDAll <= threshold, 0, 1)
+treeMapB <- ifel(treeAll <= 0.1, 0, 1)
+waterMapB <- ifel(waterAll <= 0.3, 0, 1)
+shrubMapB <- ifel(shrubAll <= 0.15, 0, 1)
+lowDMapB <- ifel(lowDAll <= 0.1, 0, 1)
 
 
 
@@ -104,14 +90,14 @@ coverStack <- c(treeMap, waterMap, shrubMap, lowDMap)
 
 classR <- which.max(coverStack)
 
-plot(coverR)
+plot(classR)
 
 #now need to make a rule for determining if the class has a high enough threshold
 # need to muliply by binary so turns to zero if too low
 
 treeCalc <- ifel(classR ==1,1,0)
 treeClass <- treeMapB*treeCalc
-
+plot(treeClass)
 
 waterCalc <- ifel(classR ==2,1,0)
 waterClass <- waterMapB*waterCalc
@@ -134,7 +120,7 @@ waterClass2 <- waterClass*2
 shrubClass2 <- shrubClass*3
 lowDClass2 <- lowDClass*4
 
-# other will be zero, trees =1, buildings =2, pavement =3
+# other will be zero, trees =1, water =2, shrub =3, low =4
 finalClass <- treeClass+waterClass2+shrubClass2+lowDClass2
 
 plot(finalClass)
@@ -142,5 +128,4 @@ plot(finalClass)
 
 
 
-writeRaster(finalClass, paste0(dirP, "/finalmodel.tif"), filetype="GTiff" )
-
+writeRaster(finalClass, "/media/hkropp/research/Kolyma_Data/predictions/maps/class2020.tif", filetype="GTiff" )
