@@ -66,10 +66,10 @@ plot(treeAll)
 
 # remove noise below set threshold
 
-
+#v2 increase shrub threshold
 treeMap <- ifel(treeAll <= 0.1, 0, treeAll)
 waterMap <- ifel(waterAll <= 0.3, 0, waterAll)
-shrubMap <- ifel(shrubAll <= 0.15, 0, shrubAll)
+shrubMap <- ifel(shrubAll <= 0.3, 0, shrubAll)
 lowDMap <- ifel(lowDAll <= 0.1, 0, lowDAll)
 
 
@@ -77,7 +77,7 @@ lowDMap <- ifel(lowDAll <= 0.1, 0, lowDAll)
 
 treeMapB <- ifel(treeAll <= 0.1, 0, 1)
 waterMapB <- ifel(waterAll <= 0.3, 0, 1)
-shrubMapB <- ifel(shrubAll <= 0.15, 0, 1)
+shrubMapB <- ifel(shrubAll <= 0.3, 0, 1)
 lowDMapB <- ifel(lowDAll <= 0.1, 0, 1)
 
 
@@ -128,4 +128,4 @@ plot(finalClass)
 
 
 
-writeRaster(finalClass, "/media/hkropp/research/Kolyma_Data/predictions/maps/class2020.tif", filetype="GTiff" )
+writeRaster(finalClass, "/media/hkropp/research/Kolyma_Data/predictions/maps/class2020_v2.tif", filetype="GTiff" )
