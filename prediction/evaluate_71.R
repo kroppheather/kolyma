@@ -2,99 +2,105 @@ library(terra)
 library(ggplot2)
 library(dplyr)
 
-
+##### set up directories ----
 # directory 
-dir <-"/media/studentuser/Seagate Portable Drive/training/"
-dirV <- "/media/studentuser/Seagate Portable Drive/predictions_71/kernalmodel/valid"
-dirM <- "/media/studentuser/Seagate Portable Drive/training/masks_img"
-# images 13 and 175 are skipped
+# original images
+dirI <-"/media/hkropp/research/Kolyma_Data/training/Kolyma/u_net71e/training/img"
+# predictions
+dirV <- "/media/hkropp/research/Kolyma_Data/training/eval/1971"
+# original masks
+dirM <- "/media/hkropp/research/Kolyma_Data/training/Kolyma/u_net71e/training/masks_img"
+# images 100-125 w##### read in predictions ----ere held out from training
 
 # number of validation images
-nValid <- 40
-nTotTraining <- 400
-nTraining <- nTotTraining - nValid
+nValid <- 25
 
-# predictions
+##### read in predictions ----
 treePredict <- list()
-for(i in nTraining + 1:nValid){
-  treePredict[[i-nTraining]] <- rast(paste0(dirV,"/tree/tree_predict_",i,".tif"))
+for(i in 1:nValid){
+  treePredict[[i]] <- rast(paste0(dirV,"/tree/tree_predict_",i,".tif"))
 }
 
 waterPredict <- list()
-for(i in nTraining + 1:nValid){
-  waterPredict[[i-nTraining]] <- rast(paste0(dirV,"/water/water_predict_",i,".tif"))
+for(i in 1:nValid){
+  waterPredict[[i]] <- rast(paste0(dirV,"/water/water_predict_",i,".tif"))
 }
 
 shrubPredict <- list()
-for(i in nTraining + 1:nValid){
-  shrubPredict[[i-nTraining]] <- rast(paste0(dirV,"/shrub/shrub_predict_",i,".tif"))
+for(i in 1:nValid){
+  shrubPredict[[i]] <- rast(paste0(dirV,"/shrub/shrub_predict_",i,".tif"))
 }
 
 lowDPredict <- list()
-for(i in nTraining + 1:nValid){
-  lowDPredict[[i-nTraining]] <- rast(paste0(dirV,"/lowD/lowD_predict_",i,".tif"))
+for(i in 1:nValid){
+  lowDPredict[[i]] <- rast(paste0(dirV,"/low/lowD_predict_",i,".tif"))
 }
 
-# images
+###### read in masks -----
 imgV <- list()
 
-for(i in nTraining + 1:nValid){
-  imgV[[i-nTraining]]  <- rast(paste0(dir,"/img/img_",i,".tif"))
+
+for(i in 1:200){
+  imgV[[i]]  <- rast(paste0(dirI,"/img_",i,".tif"))
 }
 
 # masks
-
+# trees
 treeMask <- list()
-for(i in nTraining + 1:nValid){
-  path <- paste0(dirM,"/trees_img/tree_",i,".tif")
+for(i in 1:nValid){
+  path <- paste0(dirM,"/tree/tree_",i+175,".tif")
   if (file.exists(path)) {
-    treeMask[[i-nTraining]] <- rast(path)
+    treeMask[[i]] <- rast(path)
   }
   else {
-    emptyRaster <- imgV[[i -nTraining]]
+    emptyRaster <- imgV[[i +175]]
     values(emptyRaster) = 0
-    treeMask[[i - nTraining]] <- emptyRaster
+    treeMask[[i]] <- emptyRaster
+  }
+}
+# low 
+lowMask <- list()
+for(i in 1:nValid){
+  path <- paste0(dirM,"/low/low_",i+175,".tif")
+  if (file.exists(path)) {
+    lowMask[[i]] <- rast(path)
+  }
+  else {
+    emptyRaster <- imgV[[i +175]]
+    values(emptyRaster) = 0
+    lowMask[[i]] <- emptyRaster
   }
 }
 
+# water 
 waterMask <- list()
-for(i in nTraining + 1:nValid){
-  path <- paste0(dirM,"/water_img/water_",i,".tif")
+for(i in 1:nValid){
+  path <- paste0(dirM,"/water/water_",i+175,".tif")
   if (file.exists(path)) {
-    waterMask[[i - nTraining]] <- rast(path)
+    waterMask[[i]] <- rast(path)
   }
   else {
-    emptyRaster <- imgV[[i - nTraining]]
+    emptyRaster <- imgV[[i +175]]
     values(emptyRaster) = 0
-    waterMask[[i - nTraining]] <- emptyRaster
+    waterMask[[i]] <- emptyRaster
   }
 }
 
+
+# shrub 
 shrubMask <- list()
-for(i in nTraining + 1:nValid){
-  path <- paste0(dirM,"/shrubs_img/shrub_",i,".tif")
+for(i in 1:nValid){
+  path <- paste0(dirM,"/shrub/shrub_",i+175,".tif")
   if (file.exists(path)) {
-    shrubMask[[i - nTraining]] <- rast(path)
+    shrubMask[[i]] <- rast(path)
   }
   else {
-    emptyRaster <- imgV[[i - nTraining]]
+    emptyRaster <- imgV[[i +175]]
     values(emptyRaster) = 0
-    shrubMask[[i - nTraining]] <- emptyRaster
+    shrubMask[[i]] <- emptyRaster
   }
 }
 
-lowDMask <- list()
-for(i in nTraining + 1:nValid){
-  path <- paste0(dirM,"/low_density_img/low_",i,".tif")
-  if (file.exists(path)) {
-    lowDMask[[i - nTraining]] <- rast(path)
-  }
-  else {
-    emptyRaster <- imgV[[i - nTraining]]
-    values(emptyRaster) = 0
-    lowDMask[[i - nTraining]] <- emptyRaster
-  }
-}
 
 sampStack <- list()
 
@@ -106,11 +112,18 @@ for(i in 1:nValid){
                           treeMask[[i]],
                           waterMask[[i]],
                           shrubMask[[i]],
-                          lowDMask[[i]],
-                          imgV[[i]]
-  )
+                          lowMask[[i]],
+                          imgV[[i+175]])
+  
 }
 
+
+plot(waterMask[[1]])
+plot(imgV[[1+175]], col=grey(seq(1,100)/100))
+plot(waterPredict[[1]])
+test <- c(waterMask[[1]],
+          imgV[[1+175]],
+          waterPredict[[1]])
 # check influence of threshold decision with IOU and accuracy
 
 # make class under incremental thresholds
@@ -173,15 +186,16 @@ for(i in 1:nValid){
   treeTot[[i]] <- treeThresh[[i]]+treeMask[[i]]
   waterTot[[i]] <- waterThresh[[i]]+waterMask[[i]]
   shrubTot[[i]] <- shrubThresh[[i]]+shrubMask[[i]]
-  lowDTot[[i]] <- lowDThresh[[i]]+lowDMask[[i]]
+  lowDTot[[i]] <- lowDThresh[[i]]+lowMask[[i]]
 }
 
-plot(lowDMask[[6]])
+plot(lowMask[[6]])
 plot(lowDTot[[6]][[2]])
 plot(treeMask[[6]])
 plot(waterMask[[6]])
-
-plot(treeTot[[6]][[2]])
+plot(shrubMask[[6]])
+plot(shrubThresh[[6]][[1]])
+plot(shrubTot[[6]][[2]])
 plot(imgV[[6]], col=grey(1:100/100))
 
 treeAssessDF <- list()
@@ -396,27 +410,12 @@ allIOUwater$type <- rep("water", nrow(allIOUwater))
 allIOUshrub$type <- rep("shrub", nrow(allIOUshrub))
 allIOUlowD$type <- rep("low density forest", nrow(allIOUlowD))
 
-IOU50 <- rbind(allIOUtree,allIOUwater, allIOUshrub, allIOUlowD)
+IOUAll <- rbind(allIOUtree,allIOUwater, allIOUshrub, allIOUlowD)
 
 #plot IOU over the different thresholds
 
-ggplot(data=IOUtree, aes(x=thresh,y=IOU,color=imgN))+
-  geom_point()+
-  geom_path()
 
-ggplot(data=IOUwater, aes(x=thresh,y=IOU,color=imgN))+
-  geom_point()+
-  geom_path()
-
-ggplot(data=IOUshrub, aes(x=thresh,y=IOU,color=imgN))+
-  geom_point()+
-  geom_path()
-
-ggplot(data=IOUlowD, aes(x=thresh,y=IOU,color=imgN))+
-  geom_point()+
-  geom_path()
-
-ggplot(data=IOU50, aes(x=thresh,y=IOU,color=type))+
+ggplot(data=IOUAll, aes(x=thresh,y=IOU,color=type))+
   geom_point()+
   geom_path()
 #calculate threshold with highest IOU

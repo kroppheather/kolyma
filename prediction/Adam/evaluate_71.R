@@ -2,104 +2,99 @@ library(terra)
 library(ggplot2)
 library(dplyr)
 
-##### set up directories ----
+
 # directory 
-# original images
-dirI <-"/media/hkropp/research/Kolyma_Data/training/Kolyma/u_net71e/training/img"
-# predictions
-dirV <- "/media/hkropp/research/Kolyma_Data/training/eval/1971"
-# original masks
-dirM <- "/media/hkropp/research/Kolyma_Data/training/Kolyma/u_net71e/masks_img"
-# images 100-125 w##### read in predictions ----ere held out from training
+dir <-"/media/studentuser/Seagate Portable Drive/training/"
+dirV <- "/media/studentuser/Seagate Portable Drive/predictions_71/kernalmodel/valid"
+dirM <- "/media/studentuser/Seagate Portable Drive/training/masks_img"
+# images 13 and 175 are skipped
 
 # number of validation images
-nValid <- 25
+nValid <- 40
+nTotTraining <- 400
+nTraining <- nTotTraining - nValid
 
-##### read in predictions ----
+# predictions
 treePredict <- list()
-for(i in 1:nValid){
-  treePredict[[i]] <- rast(paste0(dirV,"/tree/tree_predict_",i,".tif"))
+for(i in nTraining + 1:nValid){
+  treePredict[[i-nTraining]] <- rast(paste0(dirV,"/tree/tree_predict_",i,".tif"))
 }
 
 waterPredict <- list()
-for(i in 1:nValid){
-  waterPredict[[i]] <- rast(paste0(dirV,"/water/water_predict_",i,".tif"))
+for(i in nTraining + 1:nValid){
+  waterPredict[[i-nTraining]] <- rast(paste0(dirV,"/water/water_predict_",i,".tif"))
 }
 
 shrubPredict <- list()
-for(i in 1:nValid){
-  shrubPredict[[i]] <- rast(paste0(dirV,"/shrub/shrub_predict_",i,".tif"))
+for(i in nTraining + 1:nValid){
+  shrubPredict[[i-nTraining]] <- rast(paste0(dirV,"/shrub/shrub_predict_",i,".tif"))
 }
 
 lowDPredict <- list()
-for(i in 1:nValid){
-  lowDPredict[[i]] <- rast(paste0(dirV,"/low/lowD_predict_",i,".tif"))
+for(i in nTraining + 1:nValid){
+  lowDPredict[[i-nTraining]] <- rast(paste0(dirV,"/lowD/lowD_predict_",i,".tif"))
 }
 
-###### read in masks -----
+# images
 imgV <- list()
 
-
-for(i in 1:200){
-  imgV[[i]]  <- rast(paste0(dirI,"/img_",i,".tif"))
+for(i in nTraining + 1:nValid){
+  imgV[[i-nTraining]]  <- rast(paste0(dir,"/img/img_",i,".tif"))
 }
 
 # masks
-# trees
+
 treeMask <- list()
-for(i in 1:nValid){
-  path <- paste0(dirM,"/tree/tree_",i+174,".tif")
+for(i in nTraining + 1:nValid){
+  path <- paste0(dirM,"/trees_img/tree_",i,".tif")
   if (file.exists(path)) {
-    treeMask[[i]] <- rast(path)
+    treeMask[[i-nTraining]] <- rast(path)
   }
   else {
-    emptyRaster <- imgV[[i +174]]
+    emptyRaster <- imgV[[i -nTraining]]
     values(emptyRaster) = 0
-    treeMask[[i]] <- emptyRaster
-  }
-}
-# low 
-lowMask <- list()
-for(i in 1:nValid){
-  path <- paste0(dirM,"/low/low_",i+174,".tif")
-  if (file.exists(path)) {
-    lowMask[[i]] <- rast(path)
-  }
-  else {
-    emptyRaster <- imgV[[i +174]]
-    values(emptyRaster) = 0
-    lowMask[[i]] <- emptyRaster
+    treeMask[[i - nTraining]] <- emptyRaster
   }
 }
 
-# water 
 waterMask <- list()
-for(i in 1:nValid){
-  path <- paste0(dirM,"/water/water_",i+174,".tif")
+for(i in nTraining + 1:nValid){
+  path <- paste0(dirM,"/water_img/water_",i,".tif")
   if (file.exists(path)) {
-    waterMask[[i]] <- rast(path)
+    waterMask[[i - nTraining]] <- rast(path)
   }
   else {
-    emptyRaster <- imgV[[i +174]]
+    emptyRaster <- imgV[[i - nTraining]]
     values(emptyRaster) = 0
-    waterMask[[i]] <- emptyRaster
+    waterMask[[i - nTraining]] <- emptyRaster
   }
 }
 
-# shrub 
 shrubMask <- list()
-for(i in 1:nValid){
-  path <- paste0(dirM,"/shrub/shrub_",i+174,".tif")
+for(i in nTraining + 1:nValid){
+  path <- paste0(dirM,"/shrubs_img/shrub_",i,".tif")
   if (file.exists(path)) {
-    shrubMask[[i]] <- rast(path)
+    shrubMask[[i - nTraining]] <- rast(path)
   }
   else {
-    emptyRaster <- imgV[[i +174]]
+    emptyRaster <- imgV[[i - nTraining]]
     values(emptyRaster) = 0
-    shrubMask[[i]] <- emptyRaster
+    shrubMask[[i - nTraining]] <- emptyRaster
   }
 }
 
+lowDMask <- list()
+for(i in nTraining + 1:nValid){
+  path <- paste0(dirM,"/low_density_img/low_",i,".tif")
+  if (file.exists(path)) {
+    lowDMask[[i - nTraining]] <- rast(path)
+  }
+  else {
+    emptyRaster <- imgV[[i - nTraining]]
+    values(emptyRaster) = 0
+    lowDMask[[i - nTraining]] <- emptyRaster
+  }
+}
 
 sampStack <- list()
 
@@ -111,9 +106,9 @@ for(i in 1:nValid){
                           treeMask[[i]],
                           waterMask[[i]],
                           shrubMask[[i]],
-                          lowMask[[i]],
-                          imgV[[i+174]])
-  
+                          lowDMask[[i]],
+                          imgV[[i]]
+  )
 }
 
 # check influence of threshold decision with IOU and accuracy
@@ -178,16 +173,15 @@ for(i in 1:nValid){
   treeTot[[i]] <- treeThresh[[i]]+treeMask[[i]]
   waterTot[[i]] <- waterThresh[[i]]+waterMask[[i]]
   shrubTot[[i]] <- shrubThresh[[i]]+shrubMask[[i]]
-  lowDTot[[i]] <- lowDThresh[[i]]+lowMask[[i]]
+  lowDTot[[i]] <- lowDThresh[[i]]+lowDMask[[i]]
 }
 
-plot(lowMask[[6]])
+plot(lowDMask[[6]])
 plot(lowDTot[[6]][[2]])
 plot(treeMask[[6]])
 plot(waterMask[[6]])
-plot(shrubMask[[6]])
-plot(shrubThresh[[6]][[1]])
-plot(shrubTot[[6]][[2]])
+
+plot(treeTot[[6]][[2]])
 plot(imgV[[6]], col=grey(1:100/100))
 
 treeAssessDF <- list()
@@ -402,12 +396,27 @@ allIOUwater$type <- rep("water", nrow(allIOUwater))
 allIOUshrub$type <- rep("shrub", nrow(allIOUshrub))
 allIOUlowD$type <- rep("low density forest", nrow(allIOUlowD))
 
-IOUAll <- rbind(allIOUtree,allIOUwater, allIOUshrub, allIOUlowD)
+IOU50 <- rbind(allIOUtree,allIOUwater, allIOUshrub, allIOUlowD)
 
 #plot IOU over the different thresholds
 
+ggplot(data=IOUtree, aes(x=thresh,y=IOU,color=imgN))+
+  geom_point()+
+  geom_path()
 
-ggplot(data=IOUAll, aes(x=thresh,y=IOU,color=type))+
+ggplot(data=IOUwater, aes(x=thresh,y=IOU,color=imgN))+
+  geom_point()+
+  geom_path()
+
+ggplot(data=IOUshrub, aes(x=thresh,y=IOU,color=imgN))+
+  geom_point()+
+  geom_path()
+
+ggplot(data=IOUlowD, aes(x=thresh,y=IOU,color=imgN))+
+  geom_point()+
+  geom_path()
+
+ggplot(data=IOU50, aes(x=thresh,y=IOU,color=type))+
   geom_point()+
   geom_path()
 #calculate threshold with highest IOU
