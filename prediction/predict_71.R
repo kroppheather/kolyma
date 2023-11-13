@@ -15,7 +15,6 @@ for(i in 1:Nimg){
   
 }
 
-plot(tiles[[1000]]$Blue)
 
 treeImg <- list()
 
@@ -27,7 +26,7 @@ for(i in 1:Nimg){
 
 treeAll <- do.call(merge, treeImg)
 
-test <- vrt(list.files(paste0(dirP,"/tree"), full.names=TRUE))
+
 
 waterImg <- list()
 
@@ -61,6 +60,7 @@ lowDAll <- do.call(merge, lowDImg)
 plot(lowDAll)
 plot(shrubAll)
 plot(treeAll)
+plot(waterAll)
 
 # Make final map cover -------------
 
@@ -68,16 +68,16 @@ plot(treeAll)
 
 #v2 increase shrub threshold
 treeMap <- ifel(treeAll <= 0.1, 0, treeAll)
-waterMap <- ifel(waterAll <= 0.3, 0, waterAll)
-shrubMap <- ifel(shrubAll <= 0.3, 0, shrubAll)
+waterMap <- ifel(waterAll <= 0.4, 0, waterAll)
+shrubMap <- ifel(shrubAll <= 0.7, 0, shrubAll)
 lowDMap <- ifel(lowDAll <= 0.1, 0, lowDAll)
 
 
 # binary map of above
 
 treeMapB <- ifel(treeAll <= 0.1, 0, 1)
-waterMapB <- ifel(waterAll <= 0.3, 0, 1)
-shrubMapB <- ifel(shrubAll <= 0.3, 0, 1)
+waterMapB <- ifel(waterAll <= 0.4, 0, 1)
+shrubMapB <- ifel(shrubAll <= 0.7, 0, 1)
 lowDMapB <- ifel(lowDAll <= 0.1, 0, 1)
 
 
@@ -128,4 +128,4 @@ plot(finalClass)
 
 
 
-writeRaster(finalClass, "/media/hkropp/research/Kolyma_Data/predictions/maps/class1971_v2.tif", filetype="GTiff" )
+writeRaster(finalClass, "/media/hkropp/research/Kolyma_Data/predictions/maps/class1971.tif", filetype="GTiff" )
