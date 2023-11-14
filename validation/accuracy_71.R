@@ -1,29 +1,39 @@
 library(dplyr)
 library(caret)
 library(ggplot2)
+library(terra)
 
-dirA <- "/media/studentuser/Seagate Portable Drive/predictions_71/kernalmodel/accuracy"
-valid_pts <- read.csv(paste0(dirA, '/valid_pts.csv'))
-predict_pts <- read.csv(paste0(dirA, '/predict_pts.csv'))
+# other will be zero, trees =1, water =2, shrub =3, low =4
+classPr <- rast("/media/hkropp/research/Kolyma_Data/predictions/maps/class1971.tif") 
+pointsA <- vect("/media/hkropp/research/Kolyma_Data/valid/valid_71/valid_71.shp")
+bound <- vect("/media/hkropp/research/Kolyma_Data/img_tiles/bound_71/na_bound_71e.shp")
 
-predict_pts_noNA <- na.omit(predict_pts)
+classP <- mask(classPr, bound)
 
-predict_pts_noNA$actual <- ifelse(predict_pts_noNA$Class == 'OT', 0,
-                                ifelse(predict_pts_noNA$Class == 'TR', 1,
-                                     ifelse(predict_pts_noNA$Class == 'WT', 2,
-                                              ifelse(predict_pts_noNA$Class == 'SH', 3, 4)
-                                     )
-                                )
-                            )
+plot(classP)
+plot(pointsA, add=TRUE)
 
-predict_pts_noNA$prediction <- predict_pts_noNA$RASTERVALU
+p_extract <- extract(classP, pointsA, method="simple")
 
-conf <- confusionMatrix(as.factor(predict_pts_noNA$prediction), as.factor(predict_pts_noNA$actual))
+tabA <- values(pointsA)
+tabA$classID <- ifelse(tabA$Classes == "o", 0,
+                ifelse(tabA$Classes == "t", 1,
+                ifelse(tabA$Classes == "w", 2,
+                ifelse(tabA$Classes == "s", 3,
+                ifelse(tabA$Classes == "l", 4,NA)))))
+
+tabA$predID <- p_extract[,2]
+
+predict_pts <- na.omit(tabA)
+
+conf <- confusionMatrix(as.factor(predict_pts$predID), as.factor(predict_pts$classID))
 
 
 conf$table
 
 overallAccuracy <- conf$overall[1]
+
+
 
 other_PA <- conf$table[1,1]/sum(conf$table[,1])
 tree_PA <-  conf$table[2,2]/sum(conf$table[,2])
@@ -53,17 +63,5 @@ ggplot(acc, aes(fill=type, y=percent, x=labels)) +
         axis.ticks.x = element_blank(),
         panel.grid.minor = element_blank(),
         axis.title = element_text(size = 12.5)) + labs(x = "Classification", y = "Accuracy (%)") 
-
-
-ggplot(plt, aes(Prediction,Reference, fill= Freq)) +
-  geom_tile() + geom_text(aes(label=Freq)) +
-  scale_fill_gradient(low="white", high="#A3CB8F") +
-  labs(x = "Reference",y = "Prediction") +
-  scale_y_discrete(labels=c("Other","Tree","Water","Shrub","Low Density Forest")) +
-  scale_x_discrete(labels=c("Low Density Forest","Shrub","Water","Tree","Other"))+theme_bw() + 
-  theme(text = element_text(family = "comforta"),
-        axis.ticks = element_blank(),
-        panel.grid = element_blank(),
-        axis.title = element_text(size = 12.5))
 
 

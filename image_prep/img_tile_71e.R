@@ -140,3 +140,25 @@ for(i in 1:150){
 
 
 tileI <- makeTiles(img_final, c(256,256), "K:/Environmental_Studies/hkropp/Private/siberia_wv/Kolyma/u_net71e/img_256/img.tif")
+
+
+
+
+
+imgDir <- "/media/hkropp/research/Kolyma_Data/imagery_71/1971/clip_07_16_71.tif"
+
+extent <- vect("/media/hkropp/research/Kolyma_Data/imagery_71/extent_match/extent_bound.shp")
+
+# small extent that matches available 2020 data
+ext_img <- rast(imgDir)
+img_c <- crop(ext_img, extent)
+plot(img_c, col=grey(1:100/100))
+dim(img_c)
+imgO2 <- img_c[25:16851,25:11728, drop=FALSE]
+plot(imgO2, col=grey(1:100/100))
+
+tileI <- makeTiles(imgO2, c(256,256), "/media/hkropp/research/Kolyma_Data/img_tiles/1971e/img_256_2/img.tif")
+imgO3 <- img_c[75:16851,75:11728, drop=FALSE]
+plot(imgO3, col=grey(1:100/100))
+
+tileI <- makeTiles(imgO3, c(256,256), "/media/hkropp/research/Kolyma_Data/img_tiles/1971e/img_256_3/img.tif")

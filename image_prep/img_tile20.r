@@ -100,3 +100,15 @@ training.valid <- which(training.check == 1)
 for(i in 1:25){
   writeRaster(training.samples[[i]], paste0("/media/hkropp/research/Kolyma_Data/training/Kolyma/u_net20/training/img_strat/img_",i+200,".tif"))
 } 
+
+
+
+# set up tile offset
+img <- rast("/media/hkropp/research/Kolyma_Data/imagery_20/wv8b_07_20.tif")
+dim(img)
+imgO1 <- img[25:33723, 25:23595, drop=FALSE]
+plot(imgO1)
+tileI <- makeTiles(imgO1, c(256,256), "/media/hkropp/research/Kolyma_Data/img_tiles/2020/tiles_256_2/img_.tif")
+imgO2 <- img[100:33723, 100:23595, drop=FALSE]
+plot(imgO2)
+tileI2 <- makeTiles(imgO2, c(256,256), "/media/hkropp/research/Kolyma_Data/img_tiles/2020/tiles_256_3/img_.tif")
