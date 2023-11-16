@@ -15,7 +15,7 @@ extent <- vect("K:/Environmental_Studies/hkropp/Private/siberia_wv/Kolyma/extent
 # small extent that matches available 2020 data
 ext_img <- rast(imgDir)
 img_c <- crop(ext_img, extent)
-img_final <- mask(img_c, extent, filename="K:/Environmental_Studies/hkropp/Private/siberia_wv/1971/ext_07_16_71.tif")
+img_final <-rast("K:/Environmental_Studies/hkropp/Private/siberia_wv/1971/ext_07_16_71.tif")
 plot(img_final, col = grey(1:100/100))
 
 ##### use training images in extent set up by Koplik project ----
@@ -44,64 +44,70 @@ for(i in 1:length(imgPull)){
   writeRaster(imgS[[i]], paste0("K:/Environmental_Studies/hkropp/Private/siberia_wv/Kolyma/u_net71e/training/img/img_",i,".tif"))
 }
 
-# save raster masks that were already created
+# save raster shapefiles that were already created
 # water
-wfiles <- list.files("K:/Environmental_Studies/hkropp/Private/siberia_wv/Kolyma/u_net71/training/masks_img/water_img/", pattern=".tif")
+wfiles <- list.files("K:/Environmental_Studies/hkropp/Private/siberia_wv/Kolyma/u_net71/training/masks/water/", pattern=".shp")
+wXML <-  grepl(".xml",wfiles)
+wfiles <- wfiles[wXML == FALSE]
 wfilesN <- as.numeric(gsub("\\D","", wfiles))
 wpresent <- imgPull %in% wfilesN
 
 w_mask <- list()
 for(i in 1:length(imgPull)){
   if(wpresent[i] == TRUE){
-    w_mask <- rast(paste0("K:/Environmental_Studies/hkropp/Private/siberia_wv/Kolyma/u_net71/training/masks_img/water_img/water_",
-                             imgPull[i],".tif"))
-    writeRaster(w_mask, 
-                paste0("K:/Environmental_Studies/hkropp/Private/siberia_wv/Kolyma/u_net71e/training/masks_img/water/water_",i,".tif"))
+    w_mask <- vect(paste0("K:/Environmental_Studies/hkropp/Private/siberia_wv/Kolyma/u_net71/training/masks/water/water_",
+                             imgPull[i],".shp"))
+    writeVector(w_mask, 
+                paste0("K:/Environmental_Studies/hkropp/Private/siberia_wv/Kolyma/u_net71e/shapefiles/water/water_",i,".shp"))
   }
 }
 
 # shrub
-sfiles <- list.files("K:/Environmental_Studies/hkropp/Private/siberia_wv/Kolyma/u_net71/training/masks_img/shrubs_img/", pattern=".tif")
+sfiles <- list.files("K:/Environmental_Studies/hkropp/Private/siberia_wv/Kolyma/u_net71/training/masks/shrubs", pattern=".shp")
+sXML <- grepl(".xml",sfiles)
+sfiles <- sfiles[sXML == FALSE]
 sfilesN <- as.numeric(gsub("\\D","", sfiles))
 spresent <- imgPull %in% sfilesN
 
 s_mask <- list()
 for(i in 1:length(imgPull)){
   if(spresent[i] == TRUE){
-    s_mask <- rast(paste0("K:/Environmental_Studies/hkropp/Private/siberia_wv/Kolyma/u_net71/training/masks_img/shrubs_img/shrub_",
-                          imgPull[i],".tif"))
-    writeRaster(s_mask, 
-                paste0("K:/Environmental_Studies/hkropp/Private/siberia_wv/Kolyma/u_net71e/training/masks_img/shrub/shrub_",i,".tif"))
+    s_mask <- vect(paste0("K:/Environmental_Studies/hkropp/Private/siberia_wv/Kolyma/u_net71/training/masks/shrubs/shrub_",
+                          imgPull[i],".shp"))
+    writeVector(s_mask, 
+                paste0("K:/Environmental_Studies/hkropp/Private/siberia_wv/Kolyma/u_net71e/shapefiles/shrub/shrub_",i,".shp"))
   }
 }
 
 # tree
-tfiles <- list.files("K:/Environmental_Studies/hkropp/Private/siberia_wv/Kolyma/u_net71/training/masks_img/trees_img/", pattern=".tif")
+tfiles <- list.files("K:/Environmental_Studies/hkropp/Private/siberia_wv/Kolyma/u_net71/training/masks/trees/", pattern=".shp")
+tXML <- grepl(".xml",tfiles)
+tfiles <- tfiles[sXML == FALSE]
 tfilesN <- as.numeric(gsub("\\D","", tfiles))
 tpresent <- imgPull %in% tfilesN
 
 t_mask <- list()
 for(i in 1:length(imgPull)){
   if(tpresent[i] == TRUE){
-    t_mask <- rast(paste0("K:/Environmental_Studies/hkropp/Private/siberia_wv/Kolyma/u_net71/training/masks_img/trees_img/tree_",
-                          imgPull[i],".tif"))
-    writeRaster(t_mask, 
-                paste0("K:/Environmental_Studies/hkropp/Private/siberia_wv/Kolyma/u_net71e/training/masks_img/tree/tree_",i,".tif"))
+    t_mask <- vect(paste0("K:/Environmental_Studies/hkropp/Private/siberia_wv/Kolyma/u_net71/training/masks/trees/tree_",
+                          imgPull[i],".shp"))
+    writeVector(t_mask, 
+                paste0("K:/Environmental_Studies/hkropp/Private/siberia_wv/Kolyma/u_net71e/shapefiles/tree/tree_",i,".shp"))
   }
 }
 
 # low
-lfiles <- list.files("K:/Environmental_Studies/hkropp/Private/siberia_wv/Kolyma/u_net71/training/masks_img/low_density_img/", pattern=".tif")
+lfiles <- list.files("K:/Environmental_Studies/hkropp/Private/siberia_wv/Kolyma/u_net71/training/masks/low_density/", pattern=".shp")
 lfilesN <- as.numeric(gsub("\\D","", lfiles))
 lpresent <- imgPull %in% lfilesN
 
 l_mask <- list()
 for(i in 1:length(imgPull)){
   if(lpresent[i] == TRUE){
-    l_mask <- rast(paste0("K:/Environmental_Studies/hkropp/Private/siberia_wv/Kolyma/u_net71/training/masks_img/low_density_img/low_",
-                          imgPull[i],".tif"))
-    writeRaster(l_mask, 
-                paste0("K:/Environmental_Studies/hkropp/Private/siberia_wv/Kolyma/u_net71e/training/masks_img/low/low_",i,".tif"))
+    l_mask <- vect(paste0("K:/Environmental_Studies/hkropp/Private/siberia_wv/Kolyma/u_net71/training/masks/low_density/low_",
+                          imgPull[i],".shp"))
+    writeVector(l_mask, 
+                paste0("K:/Environmental_Studies/hkropp/Private/siberia_wv/Kolyma/u_net71e/training/masks_img/low/low_",i,".shp"))
   }
 }
 
@@ -162,3 +168,45 @@ imgO3 <- img_c[75:16851,75:11728, drop=FALSE]
 plot(imgO3, col=grey(1:100/100))
 
 tileI <- makeTiles(imgO3, c(256,256), "/media/hkropp/research/Kolyma_Data/img_tiles/1971e/img_256_3/img.tif")
+
+
+
+### tree and low density stratified sampling
+tree_stratpts <- vect("K:/Environmental_Studies/hkropp/Private/siberia_wv/Kolyma/tree_1971_e/tree_strat_pts.shp")
+low_stratpts <- vect("K:/Environmental_Studies/hkropp/Private/siberia_wv/Kolyma/tree_1971_e/low_strat_pts.shp")
+plot(tree_stratpts, add=TRUE, col="red", cex=2)
+plot(low_stratpts, add=TRUE, col="red", cex=2)
+
+
+xycelll <- cells(img_c, low_stratpts)
+
+xycellt <- cells(img_c, tree_stratpts)
+
+xycell <- rbind(xycelll, xycellt[1:20,])
+
+rowi <- numeric()
+coli <- numeric()
+#training.check <- numeric()
+for(i in 1:40){
+  rowi[i] <- rowFromCell(img_c, xycell[i,2])
+  coli[i] <- colFromCell(img_c, xycell[i,2])
+}
+
+training.samples <- list()
+training.check <- numeric()
+for(i in 1:40){  
+  if(rowi[i] <= nrow(img_c)-255 & coli[i] <= ncol(img_c)-255){
+    training.samples[[i]] <-  img_c[rowi[i]:(rowi[i]+255), coli[i]:(coli[i]+255), drop=FALSE]
+    training.check[i] <- ifelse(is.na(mean(values(training.samples[[i]],mat=FALSE))) == TRUE,0,1)
+  }else{
+    training.samples[[i]] <- NA
+    training.check[i] <- 0
+  }
+}
+training.valid <- which(training.check == 1)
+
+length(training.valid)
+
+for(i in 1:40){
+  writeRaster(training.samples[[i]], paste0("K:/Environmental_Studies/hkropp/Private/siberia_wv/Kolyma/u_net71e/training/img/img_",i+200,".tif"))
+} 
