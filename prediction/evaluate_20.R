@@ -2,14 +2,15 @@ library(terra)
 library(ggplot2)
 library(dplyr)
 
+
 ##### set up directories ----
 # directory 
 # original images
-dirI <-"/media/hkropp/research/Kolyma_Data/training/Kolyma/u_net71e/training/img"
+dirI <-"/media/hkropp/research/Kolyma_Data/training/Kolyma/u_net20/training/img"
 # predictions
-dirV <- "/media/hkropp/research/Kolyma_Data/training/eval/1971"
+dirV <- "/media/hkropp/research/Kolyma_Data/training/eval/2020"
 # original masks
-dirM <- "/media/hkropp/research/Kolyma_Data/training/Kolyma/u_net71e/masks_img"
+dirM <- "/media/hkropp/research/Kolyma_Data/training/Kolyma/u_net20/masks_img"
 # images 100-125 w##### read in predictions ----ere held out from training
 
 # number of validation images
@@ -33,14 +34,14 @@ for(i in 1:nValid){
 
 lowDPredict <- list()
 for(i in 1:nValid){
-  lowDPredict[[i]] <- rast(paste0(dirV,"/low/lowD_predict_",i,".tif"))
+  lowDPredict[[i]] <- rast(paste0(dirV,"/low/low_predict_",i,".tif"))
 }
 
 ###### read in masks -----
 imgV <- list()
 
 
-for(i in 1:200){
+for(i in 1:225){
   imgV[[i]]  <- rast(paste0(dirI,"/img_",i,".tif"))
 }
 
@@ -48,12 +49,12 @@ for(i in 1:200){
 # trees
 treeMask <- list()
 for(i in 1:nValid){
-  path <- paste0(dirM,"/tree/tree_",i+174,".tif")
+  path <- paste0(dirM,"/tree/tree_",i+99,".tif")
   if (file.exists(path)) {
     treeMask[[i]] <- rast(path)
   }
   else {
-    emptyRaster <- imgV[[i +174]]
+    emptyRaster <- imgV[[i +99]]$Blue
     values(emptyRaster) = 0
     treeMask[[i]] <- emptyRaster
   }
@@ -61,12 +62,12 @@ for(i in 1:nValid){
 # low 
 lowMask <- list()
 for(i in 1:nValid){
-  path <- paste0(dirM,"/low/low_",i+174,".tif")
+  path <- paste0(dirM,"/low/low_",i+99,".tif")
   if (file.exists(path)) {
     lowMask[[i]] <- rast(path)
   }
   else {
-    emptyRaster <- imgV[[i +174]]
+    emptyRaster <- imgV[[i +99]]$Blue
     values(emptyRaster) = 0
     lowMask[[i]] <- emptyRaster
   }
@@ -75,12 +76,12 @@ for(i in 1:nValid){
 # water 
 waterMask <- list()
 for(i in 1:nValid){
-  path <- paste0(dirM,"/water/water_",i+174,".tif")
+  path <- paste0(dirM,"/water/water_",i+99,".tif")
   if (file.exists(path)) {
     waterMask[[i]] <- rast(path)
   }
   else {
-    emptyRaster <- imgV[[i +174]]
+    emptyRaster <- imgV[[i +99]]$Blue
     values(emptyRaster) = 0
     waterMask[[i]] <- emptyRaster
   }
@@ -89,12 +90,12 @@ for(i in 1:nValid){
 # shrub 
 shrubMask <- list()
 for(i in 1:nValid){
-  path <- paste0(dirM,"/shrub/shrub_",i+174,".tif")
+  path <- paste0(dirM,"/shrub/shrub_",i+99,".tif")
   if (file.exists(path)) {
     shrubMask[[i]] <- rast(path)
   }
   else {
-    emptyRaster <- imgV[[i +174]]
+    emptyRaster <- imgV[[i +99]]$Blue
     values(emptyRaster) = 0
     shrubMask[[i]] <- emptyRaster
   }
@@ -105,14 +106,14 @@ sampStack <- list()
 
 for(i in 1:nValid){
   sampStack[[i]] <- c(treePredict[[i]],
-                          waterPredict[[i]],
-                          shrubPredict[[i]],
-                          lowDPredict[[i]],
-                          treeMask[[i]],
-                          waterMask[[i]],
-                          shrubMask[[i]],
-                          lowMask[[i]],
-                          imgV[[i+174]])
+                      waterPredict[[i]],
+                      shrubPredict[[i]],
+                      lowDPredict[[i]],
+                      treeMask[[i]],
+                      waterMask[[i]],
+                      shrubMask[[i]],
+                      lowMask[[i]],
+                      imgV[[i+99]])
   
 }
 
