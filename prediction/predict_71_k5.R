@@ -220,11 +220,12 @@ plot(lowLayer)
 
 # remove noise below set threshold
 
-#v2 increase shrub threshold
+#v1 shrub and tiaga threshold at 0.4
+#v2 increased threshold to 0.6 for both
 treeMap <- ifel(treeLayer <= 0.3, 0, treeLayer)
 waterMap <- ifel(waterLayer <= 0.6, 0, waterLayer)
-shrubMap <- ifel(shrubLayer <= 0.4, 0, shrubAll)
-lowDMap <- ifel(lowLayer <= 0.4, 0, lowLayer)
+shrubMap <- ifel(shrubLayer <= 0.6, 0, shrubAll)
+lowDMap <- ifel(lowLayer <= 0.6, 0, lowLayer)
 
 
 plot(treeMap)
@@ -236,8 +237,8 @@ plot(lowDMap)
 
 treeMapB <- ifel(treeLayer <= 0.3, 0, 1)
 waterMapB <- ifel(waterLayer <= 0.6, 0, 1)
-shrubMapB <- ifel(shrubLayer <= 0.4, 0, 1)
-lowDMapB <- ifel(lowLayer <= 0.4, 0, 1)
+shrubMapB <- ifel(shrubLayer <= 0.6, 0, 1)
+lowDMapB <- ifel(lowLayer <= 0.6, 0, 1)
 
 
 
@@ -287,4 +288,4 @@ plot(finalClass)
 
 
 
-writeRaster(finalClass, "/media/hkropp/research/Kolyma_Data/predictions/maps/class1971_k5.tif", filetype="GTiff" )
+writeRaster(finalClass, "/media/hkropp/research/Kolyma_Data/predictions/maps/class1971_k5_v2.tif", filetype="GTiff" )
