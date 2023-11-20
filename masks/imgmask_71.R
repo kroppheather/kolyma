@@ -7,9 +7,9 @@
 library(terra)
 library(dplyr)
 
-# first 50 masks were created by Adam
 
-dirD <- "/media/hkropp/research/Kolyma_Data/training/Kolyma/u_net71e/training"
+
+dirD <- "/media/hkropp/research/Kolyma_Data/training/Kolyma/u_net71e/training_strat"
 
 img <- list.files(paste0(dirD, "/img"),pattern=".tif")
 imgXML <- grepl(".aux.xml",img)
@@ -65,7 +65,7 @@ for(i in 1:length(water)){
 
 
 for(i in 1:length(water)){
-  writeRaster(waterR[[i]], paste0("/media/hkropp/research/Kolyma_Data/training/Kolyma/u_net71e/training/masks_img/water/", waterName[i] ))
+  writeRaster(waterR[[i]], paste0("/media/hkropp/research/Kolyma_Data/training/Kolyma/u_net71e/training_strat/masks_img/water/", waterName[i] ))
 }
 
 shrubL <- list()
@@ -85,7 +85,7 @@ plot(shrubL[[2]])
 plot(shrubR[[2]], add=TRUE, alpha=0.5)
 
 for(i in 1:length(shrubs)){
-  writeRaster(shrubR[[i]], paste0("/media/hkropp/research/Kolyma_Data/training/Kolyma/u_net71e/training/masks_img/shrub/", shrubName[i] ))
+  writeRaster(shrubR[[i]], paste0("/media/hkropp/research/Kolyma_Data/training/Kolyma/u_net71e/training_strat/masks_img/shrub/", shrubName[i] ))
 }
 
 
@@ -106,7 +106,7 @@ plot(treesL[[2]])
 plot(treesR[[2]], add=TRUE, alpha=0.5)
 
 for(i in 1:length(trees)){
-  writeRaster(treesR[[i]], paste0("/media/hkropp/research/Kolyma_Data/training/Kolyma/u_net71e/training/masks_img/tree/", treesName[i] ))
+  writeRaster(treesR[[i]], paste0("/media/hkropp/research/Kolyma_Data/training/Kolyma/u_net71e/training_strat/masks_img/tree/", treesName[i] ))
 }
 
 
@@ -125,7 +125,7 @@ for(i in 1:length(lowDensity)){
 }
 
 for(i in 1:length(lowDensity)){
-  writeRaster(lowDensityR[[i]], paste0("/media/hkropp/research/Kolyma_Data/training/Kolyma/u_net71e/training/masks_img/low/", lowDensityName[i] ))
+  writeRaster(lowDensityR[[i]], paste0("/media/hkropp/research/Kolyma_Data/training/Kolyma/u_net71e/training_strat/masks_img/low/", lowDensityName[i] ))
 }
 
 plot(l)
