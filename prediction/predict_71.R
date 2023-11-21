@@ -62,23 +62,163 @@ plot(shrubAll)
 plot(treeAll)
 plot(waterAll)
 
+
+
+# Image merge second tile ---------
+
+dirP2 <- "/media/hkropp/research/Kolyma_Data/predictions/1971_2"
+
+Nimg <- 3036
+
+
+
+treeImg2 <- list()
+
+for(i in 1:Nimg){
+  treeImg2[[i]] <- rast(paste0(dirP2,"/tree/tree_predict_",i,".tif"))
+  
+  
+}
+
+treeAll2 <- do.call(merge, treeImg2)
+
+
+
+waterImg2 <- list()
+
+for(i in 1:Nimg){
+  waterImg2[[i]] <- rast(paste0(dirP2,"/water/water_predict_",i,".tif"))
+  
+  
+}
+
+waterAll2 <- do.call(merge, waterImg2)
+
+shrubImg2 <- list()
+
+for(i in 1:Nimg){
+  shrubImg2[[i]] <- rast(paste0(dirP2,"/shrub/shrub_predict_",i,".tif"))
+  
+  
+}
+
+shrubAll2 <- do.call(merge, shrubImg2)
+
+lowDImg2 <- list()
+
+for(i in 1:Nimg){
+  lowDImg2[[i]] <- rast(paste0(dirP2,"/low/lowD_predict_",i,".tif"))
+  
+  
+}
+
+lowDAll2 <- do.call(merge, lowDImg2)
+plot(lowDAll2)
+plot(shrubAll2)
+plot(treeAll2)
+plot(waterAll2)
+
+# Image merge third tile ---------
+
+dirP3 <- "/media/hkropp/research/Kolyma_Data/predictions/1971_3"
+
+Nimg <- 3036
+
+
+
+
+treeImg3 <- list()
+
+for(i in 1:Nimg){
+  treeImg3[[i]] <- rast(paste0(dirP3,"/tree/tree_predict_",i,".tif"))
+  
+  
+}
+
+treeAll3 <- do.call(merge, treeImg3)
+
+
+
+waterImg3 <- list()
+
+for(i in 1:Nimg){
+  waterImg3[[i]] <- rast(paste0(dirP3,"/water/water_predict_",i,".tif"))
+  
+  
+}
+
+waterAll3 <- do.call(merge, waterImg3)
+
+shrubImg3 <- list()
+
+for(i in 1:Nimg){
+  shrubImg3[[i]] <- rast(paste0(dirP3,"/shrub/shrub_predict_",i,".tif"))
+  
+  
+}
+
+shrubAll3 <- do.call(merge, shrubImg3)
+
+lowDImg3 <- list()
+
+for(i in 1:Nimg){
+  lowDImg3[[i]] <- rast(paste0(dirP3,"/low/lowD_predict_",i,".tif"))
+  
+  
+}
+
+lowDAll3 <- do.call(merge, lowDImg3)
+plot(lowDAll3)
+plot(shrubAll3)
+plot(treeAll3)
+plot(waterAll3)
+# Merge tile offsets ------
+
+# resample to original
+low2rs <- resample(lowDAll2, lowDAll)
+low3rs <- resample(lowDAll3, lowDAll)
+
+water2rs <- resample(waterAll2, waterAll)
+water3rs <- resample(waterAll3, waterAll)
+
+tree2rs <- resample(treeAll2, treeAll)
+tree3rs <- resample(treeAll3, treeAll)
+
+shrub2rs <- resample(shrubAll2, shrubAll)
+shrub3rs <- resample(shrubAll3, shrubAll)
+
+waterStack <- c(waterAll, water2rs, water3rs)
+waterLayer <- max(waterStack, na.rm=TRUE)
+plot(waterLayer)
+
+shrubStack <- c(shrubAll, shrub2rs, shrub3rs)
+shrubLayer <- max(shrubStack, na.rm=TRUE)
+plot(shrubLayer)
+
+treeStack <- c(treeAll, tree2rs, tree3rs)
+treeLayer <- max(treeStack, na.rm=TRUE)
+plot(treeLayer)
+
+lowStack <- c(lowDAll, low2rs, low3rs)
+lowLayer <- max(lowStack, na.rm=TRUE)
+plot(lowLayer)
 # Make final map cover -------------
 
 # remove noise below set threshold
 
 #v2 increase shrub threshold
-treeMap <- ifel(treeAll <= 0.1, 0, treeAll)
-waterMap <- ifel(waterAll <= 0.4, 0, waterAll)
-shrubMap <- ifel(shrubAll <= 0.85, 0, shrubAll)
-lowDMap <- ifel(lowDAll <= 0.1, 0, lowDAll)
+treeMap <- ifel(treeLayer <= 0.1, 0, treeLayer)
+waterMap <- ifel(waterLayer <= 0.4, 0, waterLayer)
+shrubMap <- ifel(shrubLayer <= 0.85, 0, shrubLayer)
+lowDMap <- ifel(lowDLayer <= 0.1, 0, lowDLayer)
 
 
 # binary map of above
 
-treeMapB <- ifel(treeAll <= 0.1, 0, 1)
-waterMapB <- ifel(waterAll <= 0.4, 0, 1)
-shrubMapB <- ifel(shrubAll <= 0.85, 0, 1)
-lowDMapB <- ifel(lowDAll <= 0.1, 0, 1)
+treeMapB <- ifel(treeLayer <= 0.1, 0, 1)
+waterMapB <- ifel(waterLayer <= 0.4, 0, 1)
+shrubMapB <- ifel(shrubLayer <= 0.85, 0, 1)
+lowDMapB <- ifel(lowDLayer <= 0.1, 0, 1)
 
 
 
