@@ -206,10 +206,10 @@ plot(lowLayer)
 
 # remove noise below set threshold
 
-#v1 
+#v2
 treeMap <- ifel(treeLayer <= 0.2, 0, treeLayer)
 waterMap <- ifel(waterLayer <= 0.6, 0, waterLayer)
-shrubMap <- ifel(shrubLayer <= 0.6, 0, shrubLayer)
+shrubMap <- ifel(shrubLayer <= 0.4, 0, shrubLayer)
 lowDMap <- ifel(lowLayer <= 0.2, 0, lowLayer)
 
 
@@ -217,7 +217,7 @@ lowDMap <- ifel(lowLayer <= 0.2, 0, lowLayer)
 
 treeMapB <- ifel(treeLayer <= 0.2, 0, 1)
 waterMapB <- ifel(waterLayer <= 0.6, 0, 1)
-shrubMapB <- ifel(shrubLayer <= 0.6, 0, 1)
+shrubMapB <- ifel(shrubLayer <= 0.4, 0, 1)
 lowDMapB <- ifel(lowLayer <= 0.2, 0, 1)
 
 
@@ -268,4 +268,4 @@ plot(finalClass)
 
 
 
-writeRaster(finalClass, "/media/hkropp/research/Kolyma_Data/predictions/maps/class1971.tif", filetype="GTiff" )
+writeRaster(finalClass, "/media/hkropp/research/Kolyma_Data/predictions/maps/class1971_v2.tif", filetype="GTiff" )
