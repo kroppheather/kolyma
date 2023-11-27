@@ -2,11 +2,12 @@ library(terra)
 library(dplyr)
 
 
-# Image merge first tile ---------
+# Image merge ---------
 
-dirP <- "/media/hkropp/research/Kolyma_Data/predictions/1971_strat_k5"
+dirP <- "/media/hkropp/research/Kolyma_Data/predictions/1971_strat"
 
 Nimg <- 3036
+
 
 
 
@@ -60,10 +61,9 @@ plot(waterAll)
 
 # Image merge second tile ---------
 
-dirP2 <- "/media/hkropp/research/Kolyma_Data/predictions/1971_strat_k5_2"
+dirP2 <- "/media/hkropp/research/Kolyma_Data/predictions/1971_strat_2"
 
 Nimg <- 3036
-
 
 
 
@@ -113,10 +113,9 @@ plot(shrubAll2)
 plot(treeAll2)
 plot(waterAll2)
 
-
 # Image merge third tile ---------
 
-dirP3 <- "/media/hkropp/research/Kolyma_Data/predictions/1971_strat_k5_3"
+dirP3 <- "/media/hkropp/research/Kolyma_Data/predictions/1971_strat_3"
 
 Nimg <- 3036
 
@@ -168,7 +167,6 @@ plot(lowDAll3)
 plot(shrubAll3)
 plot(treeAll3)
 plot(waterAll3)
-
 # Merge tile offsets ------
 
 # resample to original
@@ -199,30 +197,23 @@ plot(treeLayer)
 lowStack <- c(lowDAll, low2rs, low3rs)
 lowLayer <- max(lowStack, na.rm=TRUE)
 plot(lowLayer)
-
 # Make final map cover -------------
 
 # remove noise below set threshold
 
-#v1 shrub and tiaga threshold at 0.4
-#v2 increased threshold to 0.6 for both
+#v3
 treeMap <- ifel(treeLayer <= 0.1, 0, treeLayer)
-waterMap <- ifel(waterLayer <= 0.6, 0, waterLayer)
-shrubMap <- ifel(shrubLayer <= 0.6, 0, shrubAll)
-lowDMap <- ifel(lowLayer <= 0.4, 0, lowLayer)
+waterMap <- ifel(waterLayer <= 0.4, 0, waterLayer)
+shrubMap <- ifel(shrubLayer <= 0.6, 0, shrubLayer)
+lowDMap <- ifel(lowLayer <= 0.3, 0, lowLayer)
 
-
-plot(treeMap)
-plot(waterMap)
-plot(shrubMap)
-plot(lowDMap)
 
 # binary map of above
 
 treeMapB <- ifel(treeLayer <= 0.1, 0, 1)
-waterMapB <- ifel(waterLayer <= 0.6, 0, 1)
+waterMapB <- ifel(waterLayer <= 0.4, 0, 1)
 shrubMapB <- ifel(shrubLayer <= 0.6, 0, 1)
-lowDMapB <- ifel(lowLayer <= 0.4, 0, 1)
+lowDMapB <- ifel(lowLayer <= 0.3, 0, 1)
 
 
 
@@ -272,4 +263,4 @@ plot(finalClass)
 
 
 
-writeRaster(finalClass, "/media/hkropp/research/Kolyma_Data/predictions/maps/class1971_k5_strat_v2.tif", filetype="GTiff" )
+writeRaster(finalClass, "/media/hkropp/research/Kolyma_Data/predictions/maps/class1971_strat_v3.tif", filetype="GTiff" )

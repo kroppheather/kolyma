@@ -4,8 +4,11 @@ library(ggplot2)
 library(terra)
 
 # other will be zero, trees =1, water =2, shrub =3, low =4
-classP <- rast("/media/hkropp/research/Kolyma_Data/predictions/maps/class2020_v1.tif") 
-pointsA <- vect("/media/hkropp/research/Kolyma_Data/valid/valid_20/valid_20.shp")
+classPr <- rast("/media/hkropp/research/Kolyma_Data/predictions/maps/class1971_strat_v2.tif") 
+pointsA <- vect("/media/hkropp/research/Kolyma_Data/valid/valid_71/valid_71.shp")
+bound <- vect("/media/hkropp/research/Kolyma_Data/img_tiles/bound_71/na_bound_71e.shp")
+
+classP <- mask(classPr, bound)
 
 plot(classP)
 plot(pointsA, add=TRUE)
@@ -13,11 +16,11 @@ plot(pointsA, add=TRUE)
 p_extract <- extract(classP, pointsA, method="simple")
 
 tabA <- values(pointsA)
-tabA$classID <- ifelse(tabA$class == "o", 0,
-                ifelse(tabA$class == "t", 1,
-                ifelse(tabA$class == "w", 2,
-                ifelse(tabA$class == "s", 3,
-                ifelse(tabA$class == "l", 4,NA)))))
+tabA$classID <- ifelse(tabA$Classes == "o", 0,
+                ifelse(tabA$Classes == "t", 1,
+                ifelse(tabA$Classes == "w", 2,
+                ifelse(tabA$Classes == "s", 3,
+                ifelse(tabA$Classes == "l", 4,NA)))))
 
 tabA$predID <- p_extract[,2]
 
