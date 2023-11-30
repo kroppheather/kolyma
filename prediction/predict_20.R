@@ -1,7 +1,7 @@
 library(terra)
 library(dplyr)
 
-
+set.tempdir("/media/hkropp/cold/temp")
 # Image merge tile 1 ---------
 
 dirP <- "/media/hkropp/research/Kolyma_Data/predictions/2020"
@@ -13,11 +13,11 @@ treeImg <- list()
 
 for(i in 1:Nimg){
   treeImg[[i]] <- rast(paste0(dirP,"/tree/tree_predict_",i,".tif"))
-  
-  
 }
 
 treeAll <- do.call(merge, treeImg)
+
+writeRaster(treeAll, "/media/hkropp/cold/k_temp/treeAll_1.tif")
 
 
 waterImg <- list()

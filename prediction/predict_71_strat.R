@@ -353,7 +353,7 @@ plot(waterLayer)
 treeMap <- ifel(treeLayer <= 0.05, 0, treeLayer)
 waterMap <- ifel(waterLayer <= 0.3, 0, waterLayer)
 shrubMap <- ifel(shrubLayer <= 0.4, 0, shrubLayer)
-lowDMap <- ifel(lowLayer <= 0.2, 0, lowLayer)
+lowDMap <- ifel(lowDLayer <= 0.2, 0, lowDLayer)
 
 
 # binary map of above
@@ -361,7 +361,7 @@ lowDMap <- ifel(lowLayer <= 0.2, 0, lowLayer)
 treeMapB <- ifel(treeLayer <= 0.05, 0, 1)
 waterMapB <- ifel(waterLayer <= 0.3, 0, 1)
 shrubMapB <- ifel(shrubLayer <= 0.4, 0, 1)
-lowDMapB <- ifel(lowLayer <= 0.2, 0, 1)
+lowDMapB <- ifel(lowDLayer <= 0.2, 0, 1)
 
 
 
