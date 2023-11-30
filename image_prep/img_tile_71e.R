@@ -210,3 +210,37 @@ length(training.valid)
 for(i in 1:40){
   writeRaster(training.samples[[i]], paste0("K:/Environmental_Studies/hkropp/Private/siberia_wv/Kolyma/u_net71e/training/img/img_",i+200,".tif"))
 } 
+
+
+### tree and low density stratified sampling
+add_stratpts <- vect("K:/Environmental_Studies/hkropp/Private/siberia_wv/Kolyma/tree_1971_e/add_tree_pts.shp")
+
+xycell <- cells(img_c, add_stratpts)
+
+
+rowi <- numeric()
+coli <- numeric()
+#training.check <- numeric()
+for(i in 1:10){
+  rowi[i] <- rowFromCell(img_c, xycell[i,2])
+  coli[i] <- colFromCell(img_c, xycell[i,2])
+}
+
+training.samples <- list()
+training.check <- numeric()
+for(i in 1:10){  
+  if(rowi[i] <= nrow(img_c)-255 & coli[i] <= ncol(img_c)-255){
+    training.samples[[i]] <-  img_c[rowi[i]:(rowi[i]+255), coli[i]:(coli[i]+255), drop=FALSE]
+    training.check[i] <- ifelse(is.na(mean(values(training.samples[[i]],mat=FALSE))) == TRUE,0,1)
+  }else{
+    training.samples[[i]] <- NA
+    training.check[i] <- 0
+  }
+}
+training.valid <- which(training.check == 1)
+
+length(training.valid)
+
+for(i in 1:10){
+  writeRaster(training.samples[[i]], paste0("K:/Environmental_Studies/hkropp/Private/siberia_wv/Kolyma/u_net71e/training/img/img_",i+240,".tif"))
+} 
