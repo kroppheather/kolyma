@@ -12,9 +12,9 @@ boundF <- c("/media/hkropp/research/Kolyma_Data/img_tiles/bound_71/na_bound_71e.
             "c:/Users/hkropp/Documents/kolyma/bound/bound_71/na_bound_71e.shp")
 
 class71 <- rast(paste0(dirDat[comp], "/class1971_strat_v4.tif"))
-class20 <- rast(paste0(dirDat[comp], "/class2020_v3.tif"))
+class20 <- rast(paste0(dirDat[comp], "/class2020_v5.tif"))
 bound <- vect(boundF[comp])
-
+plot(class20)
 ###### organize data ----
 
 # set the same boundary for both
@@ -79,4 +79,30 @@ shrubHydro <- lapp(hydroc, hydroChange)
 plot(shrubHydro)
 
 # vectorize water
+water20N <- ifel(water20 == 0, NA, 1)
+plot(water20N)
+waterdist <- distance(water20N)
+waterdistM <- mask(waterdist, bound)
+plot(waterdistM)
+waterdistW <- ifel(waterdistM == 0, NA, waterdistM)
+plot(waterdistW)
+
+water71N <- ifel(water71 == 0, NA, 1)
+plot(water71N)
+waterdist71 <- distance(water71N)
+waterdistM71 <- mask(waterdist71, bound)
+
+
+classZ <- matrix(c(0,0, NA,
+                   0, 50, 1,
+                   50,100,2,
+                   100,5000,3), byrow=TRUE, ncol=3)
+waterZones <- classify(waterdistM, classZ, include.lowest=FALSE)
+waterZones71 <- classify(waterdistM71, classZ, include.lowest=FALSE)
+plot(waterZones)
+plot(waterZones71)
+
+watZ71 <- zonal(woody71, waterZones71, fun="sum")
+zone71F <- freq(waterZones71)
+
 
