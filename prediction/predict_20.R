@@ -250,12 +250,13 @@ treeLayer <- rast("/media/hkropp/cold/k_temp/treeLayer.tif")
 lowDLayer <- rast("/media/hkropp/cold/k_temp/lowLayer.tif")
 waterLayer <- rast("/media/hkropp/cold/k_temp/waterLayer.tif")
 plot(treeLayer)
+plot(waterLayer)
 
 # remove noise below set threshold
 
-#v4 
+#v5 
 treeMap <- ifel(treeLayer <= 0.6, 0, treeLayer)
-waterMap <- ifel(waterLayer <= 0.7, 0, waterLayer)
+waterMap <- ifel(waterLayer <= 0.85, 0, waterLayer)
 shrubMap <- ifel(shrubLayer <= 0.7, 0, shrubLayer)
 lowDMap <- ifel(lowDLayer <= 0.4, 0, lowDLayer)
 
@@ -263,7 +264,7 @@ lowDMap <- ifel(lowDLayer <= 0.4, 0, lowDLayer)
 # binary map of above
 
 treeMapB <- ifel(treeLayer <= 0.6, 0, 1)
-waterMapB <- ifel(waterLayer <= 0.7, 0, 1)
+waterMapB <- ifel(waterLayer <= 0.85, 0, 1)
 shrubMapB <- ifel(shrubLayer <= 0.7, 0, 1)
 lowDMapB <- ifel(lowDLayer <= 0.4, 0, 1)
 
@@ -315,4 +316,4 @@ plot(finalClass)
 
 
 
-writeRaster(finalClass, "/media/hkropp/research/Kolyma_Data/predictions/maps/class2020_v4.tif", filetype="GTiff" )
+writeRaster(finalClass, "/media/hkropp/research/Kolyma_Data/predictions/maps/class2020_v5.tif", filetype="GTiff" )
