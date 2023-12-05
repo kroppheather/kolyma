@@ -128,7 +128,7 @@ landPal <- c("#ECECDD","#000000","#0336A3","#9CC20E",  "#117835")
 
 #################### AGU Land cover ----
 
-##### Figure 1. Landcover comparison ----
+##### Figures 1a b. Landcover comparison ----
 
 
 
@@ -184,3 +184,32 @@ legend(0,9, c("other", "tree", "water", "shrub", "taiga"),
        fill=landPal, bty="n", cex=2)
 
 dev.off()
+
+
+
+
+##### Figures 2. Percent of landcover class -----
+classCount71 <- freq(class71m)
+classCount20 <- freq(class20m)
+
+classCount71$perc <- (classCount71$count/sum(classCount71$count))*100
+classCount20$perc <- (classCount20$count/sum(classCount20$count))*100
+
+wd1 <- 7
+hd1 <- 7
+
+png(paste0(dirFig[comp], "/perc_1971_cover.png"), width=9, height=9, units="in", res=300)
+layout(matrix(seq(1),ncol=1), width=lcm(c(wd1,wd2)*2.54),height=lcm(c(hd1)*2.54))
+
+plot(c(0,6), c(0, 50), type="n", axes=FALSE, yaxs="i", xaxs="i",
+  xlab = " ", ylab= " ")
+
+for(i in 1:5){
+  polygon(c(i-0.5,i-0.5,i+0.5,i+0.5),
+           c(0, classCount71$perc[i],classCount71$perc[i],0),
+           col=landPal[i], border=NA)
+}
+
+text(seq(1,5),  classCount71$perc+5, paste(round(classCount71$perc,c(0,2,0,0,0))))
+
+     
