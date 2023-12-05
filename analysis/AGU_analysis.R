@@ -123,43 +123,64 @@ zone20F$percW <- (zone20F$woodyPix /zone20F$count)*100
 # plotting colors:
 
 #land cover
-landPal <- c("#ECECDD","#DBB7D5","#7492BA","#9CC20E",  "#386641")
+landPal <- c("#ECECDD","#000000","#0336A3","#9CC20E",  "#117835")
 
 
 #################### AGU Land cover ----
 
 ##### Figure 1. Landcover comparison ----
 
-# set up mapping variables
 
-#0=other, 1=tree,2=build,3=pavement
-colsClass <- c("#FFFFFF","#008C17","#9287A1","#3B3B3A")
-colsClass74 <- c("#FFFFFF","#FFFFFF","#9287A1","#3B3B3A")
-#coordinates for area labels
-areayoff <- c(-0.5,0.5,0.5,0.5)
 
 
 # plot dim
-wd1 <- 3
-wd2 <- 1
-hd1 <- 3.5
+wd1 <- 7
+wd2 <- 2
+hd1 <- 9
 
-
-png(paste0(dirFig[comp], "/fig_1971_cover.png"), width=4, height=4, units="in", res=300)
+png(paste0(dirFig[comp], "/fig_1971_cover.png"), width=10, height=10, units="in", res=300)
 layout(matrix(seq(1,2),ncol=2), width=lcm(c(wd1,wd2)*2.54),height=lcm(c(hd1)*2.54))
 
 par(mai=c(0,0,0,0))
 plot(class71m, breaks=c(-0.5,0.5,1.5,2.5,3.5,4.5),
-     col=landPal, legend=FALSE,axes=FALSE,
+     col=landPal, legend=FALSE, mar=NA, axes=FALSE,
      maxcell=ncell(class71m))
+arrows(588700,7626300, 589700, 7626300, code=0, lwd=2)
+arrows(588700,7626000, 588700, 7626300, code=0, lwd=2)
+arrows(589700,7626000, 589700, 7626300, code=0, lwd=2)
+text(588700,7625500, "0", cex=1.5)
+text(588700,7625000, "km", cex=1.5)
+text(589700,7625500, "1", cex=1.5)
+
 par(mai=c(0,0,0,0))
 plot(c(0,10), c(0,10), axes =FALSE, type="n", xlab = " ",
      ylab=" ")
 legend(0,9, c("other", "tree", "water", "shrub", "taiga"), 
-       fill=landPal, bty="n")
+       fill=landPal, bty="n", cex=2)
 
 dev.off()
 
 
+
+
+png(paste0(dirFig[comp], "/fig_2020_cover.png"), width=10, height=10, units="in", res=300)
+layout(matrix(seq(1,2),ncol=2), width=lcm(c(wd1,wd2)*2.54),height=lcm(c(hd1)*2.54))
+
+par(mai=c(0,0,0,0))
 plot(class20m, breaks=c(-0.5,0.5,1.5,2.5,3.5,4.5),
-     col=landPal)
+     col=landPal, legend=FALSE, mar=NA, axes=FALSE,
+   maxcell=ncell(class20m))
+arrows(588700,7626300, 589700, 7626300, code=0, lwd=2)
+arrows(588700,7626000, 588700, 7626300, code=0, lwd=2)
+arrows(589700,7626000, 589700, 7626300, code=0, lwd=2)
+text(588700,7625500, "0", cex=1.5)
+text(588700,7625000, "km", cex=1.5)
+text(589700,7625500, "1", cex=1.5)
+
+par(mai=c(0,0,0,0))
+plot(c(0,10), c(0,10), axes =FALSE, type="n", xlab = " ",
+     ylab=" ")
+legend(0,9, c("other", "tree", "water", "shrub", "taiga"), 
+       fill=landPal, bty="n", cex=2)
+
+dev.off()
