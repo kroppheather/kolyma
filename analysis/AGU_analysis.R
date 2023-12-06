@@ -194,6 +194,10 @@ classCount20 <- freq(class20m)
 
 classCount71$perc <- (classCount71$count/sum(classCount71$count))*100
 classCount20$perc <- (classCount20$count/sum(classCount20$count))*100
+classCount71$percLabel <- ifelse(classCount71$perc < 1, "< 1", 
+                                 paste(round(classCount71$perc)))
+classCount20$percLabel <- ifelse(classCount20$perc < 1, "< 1", 
+                                 paste(round(classCount20$perc)))
 
 wd1 <- 7
 hd1 <- 7
@@ -210,6 +214,39 @@ for(i in 1:5){
            col=landPal[i], border=NA)
 }
 
-text(seq(1,5),  classCount71$perc+5, paste(round(classCount71$perc,c(0,2,0,0,0))))
+text(seq(1,5),  classCount71$perc+5, paste(classCount71$percLabel), cex=2)
+axis(1, seq(0,6), c("", "Other", "Tree", "Water", "Shrub", "Taiga",""), 
+     cex.axis=1.5)
+axis(2, seq(0,50, by=10), las=2, cex.axis=1.5) 
+mtext( "Percent coverage of study extent (%)",side=2, line=3, cex=2)
 
-     
+mtext("Land cover",side=1, line=3, cex=2)
+
+dev.off()
+
+
+wd1 <- 7
+hd1 <- 7
+
+png(paste0(dirFig[comp], "/perc_2020_cover.png"), width=9, height=9, units="in", res=300)
+layout(matrix(seq(1),ncol=1), width=lcm(c(wd1,wd2)*2.54),height=lcm(c(hd1)*2.54))
+
+plot(c(0,6), c(0, 50), type="n", axes=FALSE, yaxs="i", xaxs="i",
+     xlab = " ", ylab= " ")
+
+for(i in 1:5){
+  polygon(c(i-0.5,i-0.5,i+0.5,i+0.5),
+          c(0, classCount20$perc[i],classCount20$perc[i],0),
+          col=landPal[i], border=NA)
+}
+
+text(seq(1,5),  classCount20$perc+5, paste(classCount20$percLabel), cex=2)
+axis(1, seq(0,6), c("", "Other", "Tree", "Water", "Shrub", "Taiga",""), 
+     cex.axis=1.5)
+axis(2, seq(0,50, by=10), las=2, cex.axis=1.5) 
+mtext( "Percent coverage of study extent (%)",side=2, line=3, cex=2)
+
+mtext("Land cover",side=1, line=3, cex=2)
+
+dev.off()
+
