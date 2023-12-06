@@ -124,6 +124,7 @@ zone20F$percW <- (zone20F$woodyPix /zone20F$count)*100
 
 #land cover
 landPal <- c("#ECECDD","#000000","#0336A3","#9CC20E",  "#117835")
+waterPal <- c(
 
 
 #################### AGU Land cover ----
@@ -249,4 +250,7 @@ mtext( "Percent coverage of study extent (%)",side=2, line=3, cex=2)
 mtext("Land cover",side=1, line=3, cex=2)
 
 dev.off()
+
+
+
 
