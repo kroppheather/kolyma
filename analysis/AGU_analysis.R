@@ -74,13 +74,15 @@ plot(waterChange)
 # x = water change and y = woody 20
 hydroChange <- function(x, y){
   ifelse(x == 1 & y == 2 , 1, # gain of woody in water loss
-       ifelse(x == 2 & y== 1,2, 0)) #loss of woody to water gain
+       ifelse(x == 2 & y== 1, 2,0)) #loss of woody to water gain
+
 }
 
 hydroc <- c(waterChange, woodyChange)
 shrubHydro <- lapp(hydroc, hydroChange)
 # 1 = gain in woody cover due to water loss
 # 2 = loss of woody cover to gain of water
+# 3 = loss of water but no woody change
 plot(shrubHydro)
 
 # vectorize water
@@ -124,8 +126,8 @@ zone20F$percW <- (zone20F$woodyPix /zone20F$count)*100
 
 #land cover
 landPal <- c("#ECECDD","#000000","#0336A3","#9CC20E",  "#117835")
-waterPal <- c(
-
+waterPal <- c("black", "#118374", "#DB9CD5")
+colBar <- "#89A986"
 
 #################### AGU Land cover ----
 
@@ -189,7 +191,7 @@ dev.off()
 
 
 
-##### Figures 2. Percent of landcover class -----
+##### Figures 2a b. Percent of landcover class -----
 classCount71 <- freq(class71m)
 classCount20 <- freq(class20m)
 
@@ -253,4 +255,88 @@ dev.off()
 
 
 
+##### Figure 3 Hydrology facilitated change ----
+
+# plot dim
+wd1 <- 7
+wd2 <- 5
+hd1 <- 9
+
+png(paste0(dirFig[comp], "/fig_hydro_change_low.png"), width=16, height=10, units="in", res=300)
+layout(matrix(seq(1,2),ncol=2), width=lcm(c(wd1,wd2)*2.54),height=lcm(c(hd1)*2.54))
+
+par(mai=c(0,0,0,0))
+plot(shrubHydro, breaks=c(-0.5,0.5,1.5,2.5),
+     col=waterPal, legend=FALSE, mar=NA, axes=FALSE,
+     maxcell=ncell(shrubHydro))
+arrows(588700,7626300, 589700, 7626300, code=0, lwd=2)
+arrows(588700,7626000, 588700, 7626300, code=0, lwd=2)
+arrows(589700,7626000, 589700, 7626300, code=0, lwd=2)
+text(588700,7625500, "0", cex=1.5)
+text(588700,7625000, "km", cex=1.5)
+text(589700,7625500, "1", cex=1.5)
+
+par(mai=c(0,0,0,0))
+plot(c(0,10), c(0,10), axes =FALSE, type="n", xlab = " ",
+     ylab=" ")
+legend(0,9, c("other", "+ woody and - water",
+              "- woody cover and + water"), 
+       fill=waterPal, bty="n", cex=2)
+
+dev.off()
+
+
+##### Figure 4 Woody cover proximity to water cover
+
+wd1 <- 7
+hd1 <- 7
+
+png(paste0(dirFig[comp], "/prox_1971_cover.png"), width=9, height=9, units="in", res=300)
+layout(matrix(seq(1),ncol=1), width=lcm(c(wd1,wd2)*2.54),height=lcm(c(hd1)*2.54))
+
+plot(c(0.5,3.5), c(0, 70), type="n", axes=FALSE, yaxs="i", xaxs="i",
+     xlab = " ", ylab= " ")
+
+for(i in 1:3){
+  polygon(c(i-0.25,i-0.25,i+0.25,i+0.25),
+          c(0, zone71F$percW[i+1],zone71F$percW[i+1],0),
+          col=colBar, border=NA)
+}
+
+text(seq(1,3),  zone71F$percW[2:4]+5, paste(round(zone71F$percW[2:4])), cex=2)
+axis(1, seq(0,4), c("","0-50 m", "50-100 m", "> 100m ",""), 
+     cex.axis=1.5)
+axis(2, seq(0,50, by=10), las=2, cex.axis=1.5) 
+mtext( "Percent area with woody cover (%)",side=2, line=3, cex=2)
+
+mtext("Proximity to surface water",side=1, line=3, cex=2)
+
+dev.off()
+
+
+
+wd1 <- 7
+hd1 <- 7
+
+png(paste0(dirFig[comp], "/prox_2020_cover.png"), width=9, height=9, units="in", res=300)
+layout(matrix(seq(1),ncol=1), width=lcm(c(wd1,wd2)*2.54),height=lcm(c(hd1)*2.54))
+
+plot(c(0.5,3.5), c(0, 70), type="n", axes=FALSE, yaxs="i", xaxs="i",
+     xlab = " ", ylab= " ")
+
+for(i in 1:3){
+  polygon(c(i-0.25,i-0.25,i+0.25,i+0.25),
+          c(0, zone20F$percW[i+1],zone20F$percW[i+1],0),
+          col=colBar, border=NA)
+}
+
+text(seq(1,3),  zone20F$percW[2:4]+5, paste(round(zone20F$percW[2:4])), cex=2)
+axis(1, seq(0,4), c("","0-50 m", "50-100 m", "> 100m ",""), 
+     cex.axis=1.5)
+axis(2, seq(0,50, by=10), las=2, cex.axis=1.5) 
+mtext( "Percent area with woody cover (%)",side=2, line=3, cex=2)
+
+mtext("Proximity to surface water",side=1, line=3, cex=2)
+
+dev.off()
 
