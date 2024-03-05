@@ -9,7 +9,7 @@ library(dplyr)
 
 
 
-dirD <- "/media/hkropp/research/Kolyma_Data/training/Kolyma/u_net71e/training_strat"
+dirD <- "/media/hkropp/research/Kolyma_Data/training/Kolyma/v2/u_net_71v2"
 
 img <- list.files(paste0(dirD, "/img"),pattern=".tif")
 imgXML <- grepl(".aux.xml",img)
@@ -24,23 +24,18 @@ shrubs <- list.files(paste0(dirD, "/shapefiles/shrub"),pattern=".shp")
 shrubsXML <- grepl(".xml",shrubs)
 shrubs <- shrubs[shrubsXML == FALSE ] 
 
-trees <- list.files(paste0(dirD, "/shapefiles/tree"),pattern=".shp")
-treesXML <- grepl(".xml",trees)
-trees <- trees[treesXML == FALSE ] 
+taiga <- list.files(paste0(dirD, "/shapefiles/taiga"),pattern=".shp")
+taigaXML <- grepl(".xml",taiga)
+taiga <- taiga[taigaXML == FALSE ] 
 
-lowDensity <- list.files(paste0(dirD, "/shapefiles/low"),pattern=".shp")
-lowDensityXML <- grepl(".xml",lowDensity)
-lowDensity <- lowDensity[lowDensityXML == FALSE ] 
 
 imgNumber <- as.numeric(gsub("\\D","", img))
 waterNumber <- as.numeric(gsub("\\D","", water))
 waterName <- gsub(".shp", ".tif",water)
 shrubNumber <- as.numeric(gsub("\\D","", shrubs))
 shrubName <- gsub(".shp", ".tif",shrubs)
-treesNumber <- as.numeric(gsub("\\D","", trees))
-treesName <- gsub(".shp", ".tif", trees)
-lowDensityNumber <- as.numeric(gsub("\\D","", lowDensity))
-lowDensityName <- gsub(".shp", ".tif", lowDensity)
+taigaNumber <- as.numeric(gsub("\\D","", taiga))
+taigaName <- gsub(".shp", ".tif", taiga)
 
 imgL <- list()
 for(i in 1:length(img)){
@@ -65,8 +60,10 @@ for(i in 1:length(water)){
 
 
 for(i in 1:length(water)){
-  writeRaster(waterR[[i]], paste0("/media/hkropp/research/Kolyma_Data/training/Kolyma/u_net71e/training_strat/masks_img/water/", waterName[i] ))
+  writeRaster(waterR[[i]], paste0("/media/hkropp/research/Kolyma_Data/training/Kolyma/v2/u_net_71v2/masks_img/water/", waterName[i] ))
 }
+
+plot(waterR[[150]])
 
 shrubL <- list()
 for(i in 1:length(shrubs)){
@@ -85,47 +82,28 @@ plot(shrubL[[2]])
 plot(shrubR[[2]], add=TRUE, alpha=0.5)
 
 for(i in 1:length(shrubs)){
-  writeRaster(shrubR[[i]], paste0("/media/hkropp/research/Kolyma_Data/training/Kolyma/u_net71e/training_strat/masks_img/shrub/", shrubName[i] ))
+  writeRaster(shrubR[[i]], paste0("/media/hkropp/research/Kolyma_Data/training/Kolyma/v2/u_net_71v2/masks_img/shrub/", shrubName[i] ))
 }
 
 
-treesL <- list()
-for(i in 1:length(trees)){
-  treesL[[i]] <- vect(paste0(dirD, "/shapefiles/tree/",trees[i]))
+taigaL <- list()
+for(i in 1:length(taiga)){
+  taigaL[[i]] <- vect(paste0(dirD, "/shapefiles/taiga/",taiga[i]))
 }  
-
+taiga[[1]]
 imgPos <- numeric()
-treesR <- list()
+taigaR <- list()
 
-for(i in 1:length(trees)){
-  imgPos <- which(imgNumber == treesNumber[i])
-  treesR[[i]] <- rasterize(treesL[[i]], imgL[[imgPos]], background=0)
+for(i in 1:length(taiga)){
+  imgPos <- which(imgNumber == taigaNumber[i])
+  taigaR[[i]] <- rasterize(taigaL[[i]], imgL[[imgPos]], background=0)
 }
 
-plot(treesL[[2]])
-plot(treesR[[2]], add=TRUE, alpha=0.5)
+plot(taigaL[[2]])
+plot(taigaR[[2]], add=TRUE, alpha=0.5)
 
-for(i in 1:length(trees)){
-  writeRaster(treesR[[i]], paste0("/media/hkropp/research/Kolyma_Data/training/Kolyma/u_net71e/training_strat/masks_img/tree/", treesName[i] ))
+for(i in 1:length(taiga)){
+  writeRaster(taigaR[[i]], paste0("/media/hkropp/research/Kolyma_Data/training/Kolyma/v2/u_net_71v2/masks_img/taiga/", taigaName[i] ))
 }
 
 
-
-lowDensityL <- list()
-for(i in 1:length(lowDensity)){
-  lowDensityL[[i]] <- vect(paste0(dirD, "/shapefiles/low/",lowDensity[i]))
-}  
-
-imgPos <- numeric()
-lowDensityR <- list()
-
-for(i in 1:length(lowDensity)){
-  imgPos <- which(imgNumber == lowDensityNumber[i])
-  lowDensityR[[i]] <- rasterize(lowDensityL[[i]], imgL[[imgPos]], background=0)
-}
-
-for(i in 1:length(lowDensity)){
-  writeRaster(lowDensityR[[i]], paste0("/media/hkropp/research/Kolyma_Data/training/Kolyma/u_net71e/training_strat/masks_img/low/", lowDensityName[i] ))
-}
-
-plot(l)
