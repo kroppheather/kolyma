@@ -4,7 +4,7 @@ library(ggplot2)
 library(terra)
 
 # other will be zero, trees =1, water =2, shrub =3, low =4
-classPr <- rast("/media/hkropp/research/Kolyma_Data/predictions/v2/maps/class1971.tif") 
+classPr <- rast("/media/hkropp/research/Kolyma_Data/predictions/v2/maps/class1971_2.tif") 
 pointsA <- vect("/media/hkropp/research/Kolyma_Data/valid/v2/valid_71v2/valid_71v2.shp")
 bound <- vect("/media/hkropp/research/Kolyma_Data/img_tiles/bound_71/na_bound_71e.shp")
 
