@@ -5,11 +5,11 @@ library(dplyr)
 ##### set up directories ----
 # directory 
 # original images
-dirI <-"/media/hkropp/research/Kolyma_Data/training/Kolyma/u_net71e/training/img"
+dirI <-"/media/hkropp/research/Kolyma_Data/training/Kolyma/v2/u_net_71v2/img"
 # predictions
-dirV <- "/media/hkropp/research/Kolyma_Data/training/eval/1971"
+dirV <- "/media/hkropp/research/Kolyma_Data/training/eval/v2/1971"
 # original masks
-dirM <- "/media/hkropp/research/Kolyma_Data/training/Kolyma/u_net71e/training/masks_img"
+dirM <- "/media/hkropp/research/Kolyma_Data/training/Kolyma/v2/u_net_71v2/masks_img"
 # images 100-125 w##### read in predictions ----ere held out from training
 
 # number of validation images
@@ -18,7 +18,7 @@ nValid <- 25
 ##### read in predictions ----
 treePredict <- list()
 for(i in 1:nValid){
-  treePredict[[i]] <- rast(paste0(dirV,"/tree/tree_predict_",i,".tif"))
+  treePredict[[i]] <- rast(paste0(dirV,"/taiga/taiga_predict_",i,".tif"))
 }
 
 waterPredict <- list()
@@ -31,10 +31,6 @@ for(i in 1:nValid){
   shrubPredict[[i]] <- rast(paste0(dirV,"/shrub/shrub_predict_",i,".tif"))
 }
 
-lowDPredict <- list()
-for(i in 1:nValid){
-  lowDPredict[[i]] <- rast(paste0(dirV,"/low/lowD_predict_",i,".tif"))
-}
 
 ###### read in masks -----
 imgV <- list()
@@ -48,7 +44,7 @@ for(i in 1:200){
 # trees
 treeMask <- list()
 for(i in 1:nValid){
-  path <- paste0(dirM,"/tree/tree_",i+175,".tif")
+  path <- paste0(dirM,"/taiga/taiga_",i+175,".tif")
   if (file.exists(path)) {
     treeMask[[i]] <- rast(path)
   }
@@ -58,19 +54,7 @@ for(i in 1:nValid){
     treeMask[[i]] <- emptyRaster
   }
 }
-# low 
-lowMask <- list()
-for(i in 1:nValid){
-  path <- paste0(dirM,"/low/low_",i+175,".tif")
-  if (file.exists(path)) {
-    lowMask[[i]] <- rast(path)
-  }
-  else {
-    emptyRaster <- imgV[[i +175]]
-    values(emptyRaster) = 0
-    lowMask[[i]] <- emptyRaster
-  }
-}
+
 
 # water 
 waterMask <- list()
@@ -108,11 +92,9 @@ for(i in 1:nValid){
   sampStack[[i]] <- c(treePredict[[i]],
                           waterPredict[[i]],
                           shrubPredict[[i]],
-                          lowDPredict[[i]],
                           treeMask[[i]],
                           waterMask[[i]],
                           shrubMask[[i]],
-                          lowMask[[i]],
                           imgV[[i+175]])
   
 }
@@ -130,7 +112,7 @@ test <- c(waterMask[[1]],
 treeThresh <- list()
 waterThresh <- list()
 shrubThresh <- list()
-lowDThresh <- list()
+
 
 
 for(i in 1:nValid){
@@ -164,55 +146,45 @@ for(i in 1:nValid){
                             ifel(shrubPredict[[i]] <= 0.8, 0, 1),
                             ifel(shrubPredict[[i]] <= 0.9, 0, 1))
 
-  lowDThresh[[i]] <- c(ifel(lowDPredict[[i]] <= 0.1, 0, 1),
-                            ifel(lowDPredict[[i]] <= 0.2, 0, 1),
-                            ifel(lowDPredict[[i]] <= 0.3, 0, 1),
-                            ifel(lowDPredict[[i]] <= 0.4, 0, 1),
-                            ifel(lowDPredict[[i]] <= 0.5, 0, 1),
-                            ifel(lowDPredict[[i]] <= 0.6, 0, 1),
-                            ifel(lowDPredict[[i]] <= 0.7, 0, 1),
-                            ifel(lowDPredict[[i]] <= 0.8, 0, 1),
-                            ifel(lowDPredict[[i]] <= 0.9, 0, 1))
 }
 
 #calculate IOU and accuracy for each
 treeTot <- list()
 waterTot <- list()
 shrubTot <- list()
-lowDTot <- list()
+
 
 for(i in 1:nValid){
   
   treeTot[[i]] <- treeThresh[[i]]+treeMask[[i]]
   waterTot[[i]] <- waterThresh[[i]]+waterMask[[i]]
   shrubTot[[i]] <- shrubThresh[[i]]+shrubMask[[i]]
-  lowDTot[[i]] <- lowDThresh[[i]]+lowMask[[i]]
+
 }
 
-plot(lowMask[[6]])
-plot(lowDTot[[6]][[2]])
+
 plot(treeMask[[6]])
 plot(waterMask[[6]])
 plot(shrubMask[[6]])
 plot(shrubThresh[[6]][[1]])
 plot(shrubTot[[6]][[2]])
-plot(imgV[[6]], col=grey(1:100/100))
+
 
 treeAssessDF <- list()
 waterAssessDF <- list()
 shrubAssessDF <- list()
-lowDAssessDF <- list()
+
 for(i in 1:nValid){
   treeAssessDF[[i]] <- freq(treeTot[[i]])
   waterAssessDF[[i]] <- freq(waterTot[[i]])
   shrubAssessDF[[i]] <- freq(shrubTot[[i]])
-  lowDAssessDF[[i]] <- freq(lowDTot[[i]])
+
 }  
 
 treeAssess <- list()
 waterAssess <- list()
 shrubAssess <- list()
-lowDAssess <- list()
+
 
 for(i in 1:nValid){
   splitTreeAssess = split(treeAssessDF[[i]], f = treeAssessDF[[i]]$layer)
@@ -224,8 +196,7 @@ for(i in 1:nValid){
   splitShrubAssess = split(shrubAssessDF[[i]], f = shrubAssessDF[[i]]$layer)
   shrubAssess[[i]] = splitShrubAssess
 
-  splitLowDAssess = split(lowDAssessDF[[i]], f = lowDAssessDF[[i]]$layer)
-  lowDAssess[[i]] = splitLowDAssess
+
 }
 
 #calculate IOU using pixels as area (1 pixel)
@@ -243,8 +214,7 @@ waterDF <- data.frame()
 shrubIOU <- list()
 shrubDF <- data.frame()
 
-lowDIOU <- list()
-lowDDF <- data.frame()
+
 
 for(i in 1:nValid){
   if(nrow(treeAssess[[i]][[1]]) == 3){
@@ -306,30 +276,11 @@ for(i in 1:nValid){
   shrubIOU[[i]] <- shrubDF
 }
 
-for(i in 1:nValid){
-  if(nrow(lowDAssess[[i]][[1]]) == 3){
-    lowDDF <- data.frame(thresh=threshSeq[1],
-                         IOU = lowDAssess[[i]][[1]][3,2]/(lowDAssess[[i]][[1]][2,2]+lowDAssess[[i]][[1]][3,2]),
-                         imgN = i)
-  }else{ lowDDF <- data.frame(thresh=threshSeq[1],
-                              IOU = 0,
-                              imgN = i)}
-  for(j in 2:9){
-    if(nrow(lowDAssess[[i]][[j]]) == 3){  
-      lowDDF <- rbind(lowDDF,data.frame(thresh=threshSeq[j],
-                                        IOU = lowDAssess[[i]][[j]][3,2]/(lowDAssess[[i]][[j]][2,2]+lowDAssess[[i]][[j]][3,2]),
-                                        imgN=i))
-    }else{ lowDDF <- rbind(lowDDF,data.frame(thresh=threshSeq[j],
-                                             IOU = 0,
-                                             imgN=i))}
-  }
-  lowDIOU[[i]] <- lowDDF
-}
 
 IOUtree <- do.call("rbind", treeIOU)
 IOUwater <- do.call("rbind", waterIOU)
 IOUshrub <- do.call("rbind", shrubIOU)
-IOUlowD <- do.call("rbind", lowDIOU)
+
 
 #calculate IOU across all images
 treeTotDF <- list()
@@ -368,22 +319,11 @@ for(i in 1:nValid){
   shrubTotDF[[i]] <- tempDFs
 }  
 
-lowDTotDF <- list()
-tempDFl <- data.frame()
-for(i in 1:nValid){
-  tempDFl <- data.frame(lowDAssess[[i]][[1]])
-  tempDFl$thresh <- rep(0.1,nrow(tempDFl))
-  for(j in 2:9){
-    tempDFl <- rbind(tempDFl,data.frame(lowDAssess[[i]][[j]],
-                                        thresh=rep(j/10,nrow(data.frame(lowDAssess[[i]][[j]])))))
-  }  
-  lowDTotDF[[i]] <- tempDFl
-}  
 
 treeSumDF <- do.call("rbind",treeTotDF)
 waterSumDF <- do.call("rbind",waterTotDF)
 shrubSumDF <- do.call("rbind",shrubTotDF)
-lowDSumDF <- do.call("rbind",lowDTotDF)
+
 
 IOUcalc <- function(x,y){
   sum(x[y == 2])/ (sum(x[y == 2])+ sum(x[y == 1]))
@@ -401,16 +341,14 @@ allIOUshrub <- shrubSumDF %>%
   group_by(thresh) %>%
   summarize(IOU=IOUcalc(count,value))
 
-allIOUlowD <- lowDSumDF %>%
-  group_by(thresh) %>%
-  summarize(IOU=IOUcalc(count,value))
 
-allIOUtree$type <- rep("tree", nrow(allIOUtree))
+
+allIOUtree$type <- rep("taiga", nrow(allIOUtree))
 allIOUwater$type <- rep("water", nrow(allIOUwater))
 allIOUshrub$type <- rep("shrub", nrow(allIOUshrub))
-allIOUlowD$type <- rep("low density forest", nrow(allIOUlowD))
 
-IOUAll <- rbind(allIOUtree,allIOUwater, allIOUshrub, allIOUlowD)
+
+IOUAll <- rbind(allIOUtree,allIOUwater, allIOUshrub)
 
 #plot IOU over the different thresholds
 

@@ -4,7 +4,7 @@ library(dplyr)
 
 # Image merge ---------
 
-dirP <- "/media/hkropp/research/Kolyma_Data/predictions/1971"
+dirP <- "/media/hkropp/research/Kolyma_Data/predictions/v2/1971"
 
 Nimg <- 3036
 
@@ -19,13 +19,13 @@ for(i in 1:Nimg){
 treeImg <- list()
 
 for(i in 1:Nimg){
-  treeImg[[i]] <- rast(paste0(dirP,"/tree/tree_predict_",i,".tif"))
+  treeImg[[i]] <- rast(paste0(dirP,"/taiga/taiga_predict_",i,".tif"))
   
   
 }
 
 treeAll <- do.call(merge, treeImg)
-
+plot(treeAll)
 
 
 waterImg <- list()
@@ -48,25 +48,13 @@ for(i in 1:Nimg){
 
 shrubAll <- do.call(merge, shrubImg)
 
-lowDImg <- list()
 
-for(i in 1:Nimg){
-  lowDImg[[i]] <- rast(paste0(dirP,"/low/lowD_predict_",i,".tif"))
-  
-  
-}
-
-lowDAll <- do.call(merge, lowDImg)
-plot(lowDAll)
-plot(shrubAll)
-plot(treeAll)
-plot(waterAll)
 
 
 
 # Image merge second tile ---------
 
-dirP2 <- "/media/hkropp/research/Kolyma_Data/predictions/1971_2"
+dirP2 <- "/media/hkropp/research/Kolyma_Data/predictions/v2/1971_2"
 
 Nimg <- 3036
 
@@ -75,7 +63,7 @@ Nimg <- 3036
 treeImg2 <- list()
 
 for(i in 1:Nimg){
-  treeImg2[[i]] <- rast(paste0(dirP2,"/tree/tree_predict_",i,".tif"))
+  treeImg2[[i]] <- rast(paste0(dirP2,"/taiga/taiga_predict_",i,".tif"))
   
   
 }
@@ -104,23 +92,14 @@ for(i in 1:Nimg){
 
 shrubAll2 <- do.call(merge, shrubImg2)
 
-lowDImg2 <- list()
 
-for(i in 1:Nimg){
-  lowDImg2[[i]] <- rast(paste0(dirP2,"/low/lowD_predict_",i,".tif"))
-  
-  
-}
-
-lowDAll2 <- do.call(merge, lowDImg2)
-plot(lowDAll2)
 plot(shrubAll2)
 plot(treeAll2)
 plot(waterAll2)
 
 # Image merge third tile ---------
 
-dirP3 <- "/media/hkropp/research/Kolyma_Data/predictions/1971_3"
+dirP3 <- "/media/hkropp/research/Kolyma_Data/predictions/v2/1971_3"
 
 Nimg <- 3036
 
@@ -130,7 +109,7 @@ Nimg <- 3036
 treeImg3 <- list()
 
 for(i in 1:Nimg){
-  treeImg3[[i]] <- rast(paste0(dirP3,"/tree/tree_predict_",i,".tif"))
+  treeImg3[[i]] <- rast(paste0(dirP3,"/taiga/taiga_predict_",i,".tif"))
   
   
 }
@@ -159,24 +138,13 @@ for(i in 1:Nimg){
 
 shrubAll3 <- do.call(merge, shrubImg3)
 
-lowDImg3 <- list()
 
-for(i in 1:Nimg){
-  lowDImg3[[i]] <- rast(paste0(dirP3,"/low/lowD_predict_",i,".tif"))
-  
-  
-}
-
-lowDAll3 <- do.call(merge, lowDImg3)
-plot(lowDAll3)
 plot(shrubAll3)
 plot(treeAll3)
 plot(waterAll3)
 # Merge tile offsets ------
 
 # resample to original
-low2rs <- resample(lowDAll2, lowDAll)
-low3rs <- resample(lowDAll3, lowDAll)
 
 water2rs <- resample(waterAll2, waterAll)
 water3rs <- resample(waterAll3, waterAll)
@@ -188,8 +156,10 @@ shrub2rs <- resample(shrubAll2, shrubAll)
 shrub3rs <- resample(shrubAll3, shrubAll)
 
 waterStack <- c(waterAll, water2rs, water3rs)
-waterLayer <- max(waterStack, na.rm=TRUE)
+waterLayer <- mean(waterStack, na.rm=TRUE)
+waterLayerM <- max(waterStack, na.rm=TRUE)
 plot(waterLayer)
+plot(waterLayerM)
 
 shrubStack <- c(shrubAll, shrub2rs, shrub3rs)
 shrubLayer <- max(shrubStack, na.rm=TRUE)
