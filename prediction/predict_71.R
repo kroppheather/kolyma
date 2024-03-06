@@ -157,38 +157,35 @@ shrub3rs <- resample(shrubAll3, shrubAll)
 
 waterStack <- c(waterAll, water2rs, water3rs)
 waterLayer <- mean(waterStack, na.rm=TRUE)
-waterLayerM <- max(waterStack, na.rm=TRUE)
 plot(waterLayer)
-plot(waterLayerM)
+
 
 shrubStack <- c(shrubAll, shrub2rs, shrub3rs)
-shrubLayer <- max(shrubStack, na.rm=TRUE)
+shrubLayer <- mean(shrubStack, na.rm=TRUE)
 plot(shrubLayer)
 
 treeStack <- c(treeAll, tree2rs, tree3rs)
-treeLayer <- max(treeStack, na.rm=TRUE)
+treeLayer <- mean(treeStack, na.rm=TRUE)
 plot(treeLayer)
 
-lowStack <- c(lowDAll, low2rs, low3rs)
-lowLayer <- max(lowStack, na.rm=TRUE)
-plot(lowLayer)
+
 # Make final map cover -------------
 
 # remove noise below set threshold
 
 #v3
-treeMap <- ifel(treeLayer <= 0.1, 0, treeLayer)
+treeMap <- ifel(treeLayer <= 0.3, 0, treeLayer)
 waterMap <- ifel(waterLayer <= 0.6, 0, waterLayer)
-shrubMap <- ifel(shrubLayer <= 0.3, 0, shrubLayer)
-lowDMap <- ifel(lowLayer <= 0.1, 0, lowLayer)
+shrubMap <- ifel(shrubLayer <= 0.4, 0, shrubLayer)
+
 
 
 # binary map of above
 
-treeMapB <- ifel(treeLayer <= 0.1, 0, 1)
+treeMapB <- ifel(treeLayer <= 0.3, 0, 1)
 waterMapB <- ifel(waterLayer <= 0.6, 0, 1)
-shrubMapB <- ifel(shrubLayer <= 0.3, 0, 1)
-lowDMapB <- ifel(lowLayer <= 0.1, 0, 1)
+shrubMapB <- ifel(shrubLayer <= 0.4, 0, 1)
+
 
 
 
@@ -196,7 +193,7 @@ lowDMapB <- ifel(lowLayer <= 0.1, 0, 1)
 # need to filter so only one class for each pixel
 # take the highest probability
 
-coverStack <- c(treeMap, waterMap, shrubMap, lowDMap)
+coverStack <- c(treeMap, waterMap, shrubMap)
 
 classR <- which.max(coverStack)
 
@@ -217,25 +214,23 @@ shrubCalc <- ifel(classR ==3,1,0)
 shrubClass <- shrubMapB*shrubCalc
 
 
-lowDCalc <- ifel(classR ==4,1,0)
-lowDClass <- lowDMapB*lowDCalc
 
 plot(treeClass)
 plot(waterClass)
 plot(shrubClass)
-plot(lowDClass)
+
 
 
 waterClass2 <- waterClass*2
 shrubClass2 <- shrubClass*3
-lowDClass2 <- lowDClass*4
 
-# other will be zero, trees =1, water =2, shrub =3, low =4
-finalClass <- treeClass+waterClass2+shrubClass2+lowDClass2
+
+# other will be zero, taiga =1, water =2, shrub =3
+finalClass <- treeClass+waterClass2+shrubClass2
 
 plot(finalClass)
 
 
 
 
-writeRaster(finalClass, "/media/hkropp/research/Kolyma_Data/predictions/maps/class1971_v3.tif", filetype="GTiff" )
+writeRaster(finalClass, "/media/hkropp/research/Kolyma_Data/predictions/v2/maps/class1971.tif", filetype="GTiff" )
