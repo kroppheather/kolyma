@@ -244,3 +244,42 @@ length(training.valid)
 for(i in 1:10){
   writeRaster(training.samples[[i]], paste0("K:/Environmental_Studies/hkropp/Private/siberia_wv/Kolyma/u_net71e/training/img/img_",i+240,".tif"))
 } 
+
+
+### additional stratified sampling to increase coverage across the study extent
+stratpts <- vect("K:/Environmental_Studies/hkropp/Private/siberia_wv/Kolyma/strat71_2/strat_2.shp")
+
+plot(stratpts, add=TRUE, col="red", cex=2)
+
+
+
+xycell <- cells(img_c, stratpts)
+
+
+
+rowi <- numeric()
+coli <- numeric()
+#training.check <- numeric()
+for(i in 1:32){
+  rowi[i] <- rowFromCell(img_c, xycell[i,2])
+  coli[i] <- colFromCell(img_c, xycell[i,2])
+}
+
+training.samples <- list()
+training.check <- numeric()
+for(i in 1:32){  
+  if(rowi[i] <= nrow(img_c)-255 & coli[i] <= ncol(img_c)-255){
+    training.samples[[i]] <-  img_c[rowi[i]:(rowi[i]+255), coli[i]:(coli[i]+255), drop=FALSE]
+    training.check[i] <- ifelse(is.na(mean(values(training.samples[[i]],mat=FALSE))) == TRUE,0,1)
+  }else{
+    training.samples[[i]] <- NA
+    training.check[i] <- 0
+  }
+}
+training.valid <- which(training.check == 1)
+
+length(training.valid)
+
+for(i in 1:32){
+  writeRaster(training.samples[[i]], paste0("K:/Environmental_Studies/hkropp/Private/siberia_wv/Kolyma/u_net_71v2/img/img_",i+250,".tif"))
+} 
