@@ -1,7 +1,7 @@
 library(terra)
 library(dplyr)
 
-
+bound <- vect("/media/hkropp/research/Kolyma_Data/img_tiles/bound_71/na_bound_71e.shp")
 # Image merge ---------
 
 dirP <- "/media/hkropp/research/Kolyma_Data/predictions/v2/1971"
@@ -175,7 +175,7 @@ plot(treeLayer)
 
 #v2
 treeMap <- ifel(treeLayer <= 0.3, 0, treeLayer)
-waterMap <- ifel(waterLayer <= 0.6, 0, waterLayer)
+waterMap <- ifel(waterLayer <= 0.7, 0, waterLayer)
 shrubMap <- ifel(shrubLayer <= 0.3, 0, shrubLayer)
 
 
@@ -183,7 +183,7 @@ shrubMap <- ifel(shrubLayer <= 0.3, 0, shrubLayer)
 # binary map of above
 
 treeMapB <- ifel(treeLayer <= 0.3, 0, 1)
-waterMapB <- ifel(waterLayer <= 0.6, 0, 1)
+waterMapB <- ifel(waterLayer <= 0.7, 0, 1)
 shrubMapB <- ifel(shrubLayer <= 0.3, 0, 1)
 
 
@@ -226,11 +226,9 @@ shrubClass2 <- shrubClass*3
 
 
 # other will be zero, taiga =1, water =2, shrub =3
-finalClass <- treeClass+waterClass2+shrubClass2
+finalClassA <- treeClass+waterClass2+shrubClass2
 
+finalClass <- mask(finalClassA, bound)
 plot(finalClass)
 
-
-
-
-writeRaster(finalClass, "/media/hkropp/research/Kolyma_Data/predictions/v2/maps/class1971_2.tif", filetype="GTiff" )
+writeRaster(finalClass, "/media/hkropp/research/Kolyma_Data/predictions/v2/maps/class1971.tif", filetype="GTiff" )
