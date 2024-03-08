@@ -176,7 +176,7 @@ plot(treeLayer)
 #v2
 treeMap <- ifel(treeLayer <= 0.3, 0, treeLayer)
 waterMap <- ifel(waterLayer <= 0.7, 0, waterLayer)
-shrubMap <- ifel(shrubLayer <= 0.3, 0, shrubLayer)
+shrubMap <- ifel(shrubLayer <= 0.4, 0, shrubLayer)
 
 
 
@@ -184,7 +184,7 @@ shrubMap <- ifel(shrubLayer <= 0.3, 0, shrubLayer)
 
 treeMapB <- ifel(treeLayer <= 0.3, 0, 1)
 waterMapB <- ifel(waterLayer <= 0.7, 0, 1)
-shrubMapB <- ifel(shrubLayer <= 0.3, 0, 1)
+shrubMapB <- ifel(shrubLayer <= 0.4, 0, 1)
 
 
 
@@ -231,4 +231,4 @@ finalClassA <- treeClass+waterClass2+shrubClass2
 finalClass <- mask(finalClassA, bound)
 plot(finalClass)
 
-writeRaster(finalClass, "/media/hkropp/research/Kolyma_Data/predictions/v2/maps/class1971.tif", filetype="GTiff" )
+writeRaster(finalClass, "/media/hkropp/research/Kolyma_Data/predictions/v2/maps/class1971_2.tif", filetype="GTiff" )
