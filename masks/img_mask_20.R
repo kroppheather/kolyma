@@ -7,27 +7,24 @@
 library(terra)
 library(dplyr)
 
-dirD <- "/media/hkropp/research/Kolyma_Data/training/Kolyma/u_net20"
+dirD <- "/media/hkropp/research/Kolyma_Data/training/Kolyma/v2/u_net_20v2"
 # names of all shapefiles
-img <- list.files(paste0(dirD, "/training/img"),pattern=".tif")
+img <- list.files(paste0(dirD, "/img"),pattern=".tif")
 imgXML <- grepl(".aux.xml",img)
 img <- img[imgXML == FALSE ] 
 
-water <- list.files(paste0(dirD, "/shapefiles/shapefiles/water"),pattern=".shp")
+water <- list.files(paste0(dirD, "/shapefiles/water"),pattern=".shp")
 waterXML <- grepl(".xml",water)
 water <- water[waterXML == FALSE ] 
 
-shrubs <- list.files(paste0(dirD, "/shapefiles/shapefiles/shrub"),pattern=".shp")
+shrubs <- list.files(paste0(dirD, "/shapefiles/shrub"),pattern=".shp")
 shrubsXML <- grepl(".xml",shrubs)
 shrubs <- shrubs[shrubsXML == FALSE ] 
 
-trees <- list.files(paste0(dirD, "/shapefiles/shapefiles/tree"),pattern=".shp")
+trees <- list.files(paste0(dirD, "/shapefiles/taiga"),pattern=".shp")
 treesXML <- grepl(".xml",trees)
 trees <- trees[treesXML == FALSE ] 
 
-low <- list.files(paste0(dirD, "/shapefiles/shapefiles/low"),pattern=".shp")
-lowXML <- grepl(".xml",low)
-low <- low[lowXML == FALSE ] 
 
 # extract numbers and naming info
 imgNumber <- as.numeric(gsub("\\D","", img))
@@ -37,21 +34,20 @@ shrubNumber <- as.numeric(gsub("\\D","", shrubs))
 shrubName <- gsub(".shp", ".tif",shrubs)
 treesNumber <- as.numeric(gsub("\\D","", trees))
 treesName <- gsub(".shp", ".tif", trees)
-lowNumber <- as.numeric(gsub("\\D","", low))
-lowName <- gsub(".shp", ".tif", low)
+
 
 
 # read in all images
 imgL <- list()
 for(i in 1:length(img)){
-  imgL[[i]] <- rast(paste0(dirD,"/training/img/",img[i]))
+  imgL[[i]] <- rast(paste0(dirD,"/img/",img[i]))
   
 }
 #### Water ----
 # read in shapefiles
 waterL <- list()
 for(i in 1:length(water)){
-  waterL[[i]] <- vect(paste0(dirD, "/shapefiles/shapefiles/water/",water[i]))
+  waterL[[i]] <- vect(paste0(dirD, "/shapefiles/water/",water[i]))
 }  
 
 # pull out the corresponding image and convert shapefile to raster
@@ -63,33 +59,33 @@ for(i in 1:length(water)){
 }
 
 for(i in 1:length(water)){
-  writeRaster(waterR[[i]], paste0("/media/hkropp/research/Kolyma_Data/training/Kolyma/u_net20/masks_img/water/", waterName[i] ))
+  writeRaster(waterR[[i]], paste0("/media/hkropp/research/Kolyma_Data/training/Kolyma/v2/u_net_20v2/masks_img/water/", waterName[i] ))
 }
 
 #### Shrubs ---
 # read in shapefiles
 shrubL <- list()
 for(i in 1:length(shrubs)){
-  shrubL[[i]] <- vect(paste0(dirD, "/shapefiles/shapefiles/shrub/",shrubs[i]))
+  shrubL[[i]] <- vect(paste0(dirD, "/shapefiles/shrub/",shrubs[i]))
 }  
 
 # pull out the corresponding image and convert shapefile to raster
 imgPos <- numeric()
 shrubR <- list()
-for(i in 1:length(water)){
+for(i in 1:length(shrubs)){
   imgPos <- which(imgNumber == shrubNumber[i])
   shrubR[[i]] <- rasterize(shrubL[[i]], imgL[[imgPos]], background=0)
 }
 
 for(i in 1:length(shrubs)){
-  writeRaster(shrubR[[i]], paste0("/media/hkropp/research/Kolyma_Data/training/Kolyma/u_net20/masks_img/shrub/", shrubName[i] ))
+  writeRaster(shrubR[[i]], paste0("/media/hkropp/research/Kolyma_Data/training/Kolyma/v2/u_net_20v2/masks_img/shrub/", shrubName[i] ))
 }
 
-#### Trees ---
+#### Taiga ---
 # read in shapefiles
 treesL <- list()
 for(i in 1:length(trees)){
-  treesL[[i]] <- vect(paste0(dirD, "/shapefiles/shapefiles/tree/",trees[i]))
+  treesL[[i]] <- vect(paste0(dirD, "/shapefiles/taiga/",trees[i]))
 }  
 
 # pull out the corresponding image and convert shapefile to raster
@@ -101,26 +97,6 @@ for(i in 1:length(trees)){
 }
 
 for(i in 1:length(trees)){
-  writeRaster(treesR[[i]], paste0("/media/hkropp/research/Kolyma_Data/training/Kolyma/u_net20/masks_img/tree/", treesName[i] ))
+  writeRaster(treesR[[i]], paste0("/media/hkropp/research/Kolyma_Data/training/Kolyma/v2/u_net_20v2/masks_img/taiga/", treesName[i] ))
 }
 
-
-
-#### Low ---
-# read in shapefiles
-lowL <- list()
-for(i in 1:length(low)){
-  lowL[[i]] <- vect(paste0(dirD, "/shapefiles/shapefiles/low/",low[i]))
-}  
-
-# pull out the corresponding image and convert shapefile to raster
-imgPos <- numeric()
-lowR <- list()
-for(i in 1:length(low)){
-  imgPos <- which(imgNumber == lowNumber[i])
-  lowR[[i]] <- rasterize(lowL[[i]], imgL[[imgPos]], background=0)
-}
-
-for(i in 1:length(low)){
-  writeRaster(lowR[[i]], paste0("/media/hkropp/research/Kolyma_Data/training/Kolyma/u_net20/masks_img/low/", lowName[i] ))
-}
