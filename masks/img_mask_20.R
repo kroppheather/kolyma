@@ -50,6 +50,8 @@ for(i in 1:length(water)){
   waterL[[i]] <- vect(paste0(dirD, "/shapefiles/water/",water[i]))
 }  
 
+plotRGB(imgL[[3]], stretch="lin")
+
 # pull out the corresponding image and convert shapefile to raster
 imgPos <- numeric()
 waterR <- list()
@@ -95,6 +97,13 @@ for(i in 1:length(trees)){
   imgPos <- which(imgNumber == treesNumber[i])
   treesR[[i]] <- rasterize(treesL[[i]], imgL[[imgPos]], background=0)
 }
+
+
+treesName[1]
+plotRGB(imgL[[which(imgNumber == treesNumber[8])]], stretch="lin")
+plot(treesR[[8]], add=TRUE, legend=FALSE, breaks=c(-0.1,0.9,1.3),
+     col=c(NA,"#FF634799"))
+
 
 for(i in 1:length(trees)){
   writeRaster(treesR[[i]], paste0("/media/hkropp/research/Kolyma_Data/training/Kolyma/v2/u_net_20v2/masks_img/taiga/", treesName[i] ))
