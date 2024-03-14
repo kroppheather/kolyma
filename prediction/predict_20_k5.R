@@ -152,33 +152,33 @@ writeRaster(shrubAll3, "/media/hkropp/research/Kolyma_Data/predictions/v2/class_
 # Merge tile offsets ------
 
 
-waterAll <- rast("/media/hkropp/cold/k_5_2020/waterAll_1.tif")
-waterAll2 <- rast("/media/hkropp/cold/k_5_2020/waterAll_2.tif")
-waterAll3 <- rast("/media/hkropp/cold/k_5_2020/waterAll_3.tif")
+waterAll <- rast("/media/hkropp/research/Kolyma_Data/predictions/v2/class_save/2020_k5/waterAll_1.tif")
+waterAll2 <- rast("/media/hkropp/research/Kolyma_Data/predictions/v2/class_save/2020_k5/waterAll_2.tif")
+waterAll3 <- rast("/media/hkropp/research/Kolyma_Data/predictions/v2/class_save/2020_k5/waterAll_3.tif")
 
 water2rs <- resample(waterAll2, waterAll)
 water3rs <- resample(waterAll3, waterAll)
 
 waterStack <- c(waterAll, water2rs, water3rs)
-waterLayer <- max(waterStack, na.rm=TRUE)
+waterLayer <- mean(waterStack, na.rm=TRUE)
 plot(waterLayer)
 
-writeRaster(waterLayer, "/media/hkropp/cold/k_5_2020/waterLayer.tif")
+writeRaster(waterLayer, "/media/hkropp/research/Kolyma_Data/predictions/v2/class_save/2020_k5/waterLayer.tif")
 
 
 
-treeAll <- rast("/media/hkropp/cold/k_5_2020/treeAll_1.tif")
-treeAll2 <- rast("/media/hkropp/cold/k_5_2020/treeAll_2.tif")
-treeAll3 <- rast("/media/hkropp/cold/k_5_2020/treeAll_3.tif")
+treeAll <- rast("/media/hkropp/research/Kolyma_Data/predictions/v2/class_save/2020_k5/taigaAll_1.tif")
+treeAll2 <- rast("/media/hkropp/research/Kolyma_Data/predictions/v2/class_save/2020_k5/taigaAll_2.tif")
+treeAll3 <- rast("/media/hkropp/research/Kolyma_Data/predictions/v2/class_save/2020_k5/taigaAll_3.tif")
 
 tree2rs <- resample(treeAll2, treeAll)
 tree3rs <- resample(treeAll3, treeAll)
 
 treeStack <- c(treeAll, tree2rs, tree3rs)
-treeLayer <- max(treeStack, na.rm=TRUE)
+treeLayer <- mean(treeStack, na.rm=TRUE)
 plot(treeLayer)
 
-writeRaster(treeLayer, "/media/hkropp/cold/k_5_2020/treeLayer.tif")
+writeRaster(treeLayer, "/media/hkropp/research/Kolyma_Data/predictions/v2/class_save/2020_k5/taigaLayer.tif")
 
 shrubAll <- rast("/media/hkropp/cold/k_5_2020/shrubAll_1.tif")
 shrubAll2 <- rast("/media/hkropp/cold/k_5_2020/shrubAll_2.tif")
