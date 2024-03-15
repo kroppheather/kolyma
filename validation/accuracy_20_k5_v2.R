@@ -4,8 +4,8 @@ library(ggplot2)
 library(terra)
 
 # other will be zero, trees =1, water =2, shrub =3, low =4
-classP <- rast("/media/hkropp/research/Kolyma_Data/predictions/maps/class2020_k5_v2.tif") 
-pointsA <- vect("/media/hkropp/research/Kolyma_Data/valid/valid_20/valid_20.shp")
+classP <- rast("/media/hkropp/research/Kolyma_Data/predictions/v2/maps/class2020_k5_v2.tif") 
+pointsA <- vect("/media/hkropp/research/Kolyma_Data/valid/v2/valid_20v2/valid_20v2.shp")
 
 plot(classP)
 plot(pointsA, add=TRUE)
@@ -14,10 +14,9 @@ p_extract <- extract(classP, pointsA, method="simple")
 
 tabA <- values(pointsA)
 tabA$classID <- ifelse(tabA$class == "o", 0,
-                ifelse(tabA$class == "t", 1,
+                ifelse(tabA$class == "ti", 1,
                 ifelse(tabA$class == "w", 2,
-                ifelse(tabA$class == "s", 3,
-                ifelse(tabA$class == "l", 4,NA)))))
+                ifelse(tabA$class == "s", 3,NA))))
 
 tabA$predID <- p_extract[,2]
 
@@ -36,19 +35,19 @@ other_PA <- conf$table[1,1]/sum(conf$table[,1])
 tree_PA <-  conf$table[2,2]/sum(conf$table[,2])
 water_PA <-  conf$table[3,3]/sum(conf$table[,3])
 shrub_PA <-  conf$table[4,4]/sum(conf$table[,4])
-lowD_PA <-  conf$table[5,5]/sum(conf$table[,5])
+
 
 other_UA <- conf$table[1,1]/sum(conf$table[1,])
 tree_UA <-  conf$table[2,2]/sum(conf$table[2,])
 water_UA <-  conf$table[3,3]/sum(conf$table[3,])
 shrub_UA <-  conf$table[4,4]/sum(conf$table[4,])
-lowD_UA <-  conf$table[5,5]/sum(conf$table[5,])
 
 
 
-labels <- c("Other", "Tree", "Water", "Shrub", "Low Density Forest", "Other", "Tree", "Water", "Shrub", "Low Density Forest")
-data <- as.numeric(c(other_UA, tree_UA, water_UA, shrub_UA, lowD_UA, other_PA, tree_PA, water_PA, shrub_PA, lowD_PA))
-type <- c("User Accuracy", "User Accuracy", "User Accuracy", "User Accuracy", "User Accuracy", "Producer Accuracy", "Producer Accuracy", "Producer Accuracy", "Producer Accuracy", "Producer Accuracy")
+
+labels <- c("Other", "Taiga", "Water", "Shrub",  "Other", "Taiga", "Water", "Shrub")
+data <- as.numeric(c(other_UA, tree_UA, water_UA, shrub_UA, other_PA, tree_PA, water_PA, shrub_PA))
+type <- c("User Accuracy", "User Accuracy",  "User Accuracy", "User Accuracy", "Producer Accuracy", "Producer Accuracy",  "Producer Accuracy", "Producer Accuracy")
 acc <- tibble(labels, data,type)
 acc$percent <- round(acc$data*100,2)
 
@@ -61,4 +60,6 @@ ggplot(acc, aes(fill=type, y=percent, x=labels)) +
         panel.grid.minor = element_blank(),
         axis.title = element_text(size = 12.5)) + labs(x = "Classification", y = "Accuracy (%)") 
 
-
+acc
+conf$table
+overallAccuracy
