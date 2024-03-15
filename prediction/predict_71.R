@@ -173,10 +173,10 @@ plot(treeLayer)
 
 # remove noise below set threshold
 
-#v3
+#v2
 treeMap <- ifel(treeLayer <= 0.3, 0, treeLayer)
 waterMap <- ifel(waterLayer <= 0.7, 0, waterLayer)
-shrubMap <- ifel(shrubLayer <= 0.3, 0, shrubLayer)
+shrubMap <- ifel(shrubLayer <= 0.4, 0, shrubLayer)
 
 
 
@@ -184,7 +184,7 @@ shrubMap <- ifel(shrubLayer <= 0.3, 0, shrubLayer)
 
 treeMapB <- ifel(treeLayer <= 0.3, 0, 1)
 waterMapB <- ifel(waterLayer <= 0.7, 0, 1)
-shrubMapB <- ifel(shrubLayer <= 0.3, 0, 1)
+shrubMapB <- ifel(shrubLayer <= 0.4, 0, 1)
 
 
 

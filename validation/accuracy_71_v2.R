@@ -63,4 +63,6 @@ ggplot(acc, aes(fill=type, y=percent, x=labels)) +
         panel.grid.minor = element_blank(),
         axis.title = element_text(size = 12.5)) + labs(x = "Classification", y = "Accuracy (%)") 
 
-
+acc
+conf$table
+overallAccuracy

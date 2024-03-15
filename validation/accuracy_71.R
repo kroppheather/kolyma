@@ -64,6 +64,14 @@ ggplot(acc, aes(fill=type, y=percent, x=labels)) +
         axis.title = element_text(size = 12.5)) + labs(x = "Classification", y = "Accuracy (%)") 
 
 
+
+acc
+conf$table
+overallAccuracy
+
+
+
+
 pointsComp <- pointsA
 pointsComp$predC <- tabA$predID 
 plot(pointsComp)
