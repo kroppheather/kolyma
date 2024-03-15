@@ -180,20 +180,20 @@ plot(treeLayer)
 
 writeRaster(treeLayer, "/media/hkropp/research/Kolyma_Data/predictions/v2/class_save/2020_k5/taigaLayer.tif")
 
-shrubAll <- rast("/media/hkropp/cold/k_5_2020/shrubAll_1.tif")
-shrubAll2 <- rast("/media/hkropp/cold/k_5_2020/shrubAll_2.tif")
-shrubAll3 <- rast("/media/hkropp/cold/k_5_2020/shrubAll_3.tif")
+shrubAll <- rast("/media/hkropp/research/Kolyma_Data/predictions/v2/class_save/2020_k5/shrubAll_1.tif")
+shrubAll2 <- rast("/media/hkropp/research/Kolyma_Data/predictions/v2/class_save/2020_k5/shrubAll_2.tif")
+shrubAll3 <- rast("/media/hkropp/research/Kolyma_Data/predictions/v2/class_save/2020_k5/shrubAll_3.tif")
 
 shrub2rs <- resample(shrubAll2, shrubAll)
 shrub3rs <- resample(shrubAll3, shrubAll)
 
 
 shrubStack <- c(shrubAll, shrub2rs, shrub3rs)
-shrubLayer <- max(shrubStack, na.rm=TRUE)
+shrubLayer <- mean(shrubStack, na.rm=TRUE)
 plot(shrubLayer)
 
 
-writeRaster(shrubLayer, "/media/hkropp/cold/k_5_2020/shrubLayer.tif")
+writeRaster(shrubLayer, "/media/hkropp/research/Kolyma_Data/predictions/v2/class_save/2020_k5/shrubLayer.tif")
 
 
 
@@ -201,27 +201,26 @@ writeRaster(shrubLayer, "/media/hkropp/cold/k_5_2020/shrubLayer.tif")
 
 # Make final map cover -------------
 
-shrubLayer <- rast("/media/hkropp/cold/k_5_2020/shrubLayer.tif")
-treeLayer <- rast("/media/hkropp/cold/k_5_2020/treeLayer.tif")
-lowDLayer <- rast("/media/hkropp/cold/k_5_2020/lowLayer.tif")
-waterLayer <- rast("/media/hkropp/cold/k_5_2020/waterLayer.tif")
+shrubLayer <- rast("/media/hkropp/research/Kolyma_Data/predictions/v2/class_save/2020_k5/shrubLayer.tif")
+treeLayer <- rast("/media/hkropp/research/Kolyma_Data/predictions/v2/class_save/2020_k5/taigaLayer.tif")
+waterLayer <- rast("/media/hkropp/research/Kolyma_Data/predictions/v2/class_save/2020_k5/waterLayer.tif")
 plot(waterLayer)
 plot(shrubLayer)
+plot(treeLayer)
 # remove noise below set threshold
 
 # version 4
-treeMap <- ifel(treeLayer <= 0.3, 0, treeLayer)
-waterMap <- ifel(waterLayer <= 0.7, 0, waterLayer)
-shrubMap <- ifel(shrubLayer <= 0.55, 0, shrubLayer)
-lowDMap <- ifel(lowDLayer <= 0.5, 0, lowDLayer)
+treeMap <- ifel(treeLayer <= 0.5, 0, treeLayer)
+waterMap <- ifel(waterLayer <= 0.95, 0, waterLayer)
+shrubMap <- ifel(shrubLayer <= 0.45, 0, shrubLayer)
 
 
 # binary map of above
 
-treeMapB <- ifel(treeLayer <= 0.3, 0, 1)
-waterMapB <- ifel(waterLayer <= 0.7, 0, 1)
-shrubMapB <- ifel(shrubLayer <= 0.55, 0, 1)
-lowDMapB <- ifel(lowDLayer <= 0.5, 0, 1)
+treeMapB <- ifel(treeLayer <= 0.5, 0, 1)
+waterMapB <- ifel(waterLayer <= 0.95, 0, 1)
+shrubMapB <- ifel(shrubLayer <= 0.5, 0, 1)
+
 
 
 
@@ -229,7 +228,7 @@ lowDMapB <- ifel(lowDLayer <= 0.5, 0, 1)
 # need to filter so only one class for each pixel
 # take the highest probability
 
-coverStack <- c(treeMap, waterMap, shrubMap, lowDMap)
+coverStack <- c(treeMap, waterMap, shrubMap)
 
 classR <- which.max(coverStack)
 
@@ -250,25 +249,23 @@ shrubCalc <- ifel(classR ==3,1,0)
 shrubClass <- shrubMapB*shrubCalc
 
 
-lowDCalc <- ifel(classR ==4,1,0)
-lowDClass <- lowDMapB*lowDCalc
 
 plot(treeClass)
 plot(waterClass)
 plot(shrubClass)
-plot(lowDClass)
+
 
 
 waterClass2 <- waterClass*2
 shrubClass2 <- shrubClass*3
-lowDClass2 <- lowDClass*4
+
 
 # other will be zero, trees =1, water =2, shrub =3, low =4
-finalClass <- treeClass+waterClass2+shrubClass2+lowDClass2
+finalClass <- treeClass+waterClass2+shrubClass2
 
 plot(finalClass)
 
 
 
 
-writeRaster(finalClass, "/media/hkropp/research/Kolyma_Data/predictions/maps/class2020_k5_v4.tif", filetype="GTiff" )
+writeRaster(finalClass, "/media/hkropp/research/Kolyma_Data/predictions/v2/maps/class2020_k5_v1.tif", filetype="GTiff" )
