@@ -5,20 +5,36 @@ library(terra)
 
 # other will be zero, trees =1, water =2, shrub =3, low =4
 classP <- rast("/media/hkropp/research/Kolyma_Data/predictions/v2/maps/class2020_k5_v3.tif") 
-pointsA <- vect("/media/hkropp/research/Kolyma_Data/valid/v2/valid_20v2/valid_20v2.shp")
+pointsA1 <- vect("/media/hkropp/research/Kolyma_Data/valid/v2/valid_all/valid_20.shp")
+pointsA2 <- vect("/media/hkropp/research/Kolyma_Data/valid/v2/valid_all/valid_71.shp")
+
 
 plot(classP)
-plot(pointsA, add=TRUE)
+plot(pointsA1, add=TRUE)
 
-p_extract <- extract(classP, pointsA, method="simple")
+p_extract1 <- extract(classP, pointsA1, method="simple")
 
-tabA <- values(pointsA)
-tabA$classID <- ifelse(tabA$class == "o", 0,
-                ifelse(tabA$class == "ti", 1,
-                ifelse(tabA$class == "w", 2,
-                ifelse(tabA$class == "s", 3,NA))))
+tabA1 <- values(pointsA1)
+tabA1$classID <- ifelse(tabA1$class == "o", 0,
+                        ifelse(tabA1$class == "ti", 1,
+                               ifelse(tabA1$class == "w", 2,
+                                      ifelse(tabA1$class == "s", 3,NA))))
 
-tabA$predID <- p_extract[,2]
+tabA1$predID <- p_extract1[,2]
+
+
+p_extract2 <- extract(classP, pointsA2, method="simple")
+
+tabA2 <- values(pointsA2)
+tabA2$classID <- ifelse(tabA2$Class20 == "o", 0,
+                        ifelse(tabA2$Class20 == "ti", 1,
+                               ifelse(tabA2$Class20 == "w", 2,
+                                      ifelse(tabA2$Class20 == "s", 3,NA))))
+
+tabA2$predID <- p_extract2[,2]
+
+tabA <- data.frame(classID = c(tabA1$classID, tabA2$classID),
+                   predID= c(tabA1$predID, tabA2$predID))
 
 predict_pts <- na.omit(tabA)
 
