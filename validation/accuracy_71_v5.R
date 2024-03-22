@@ -4,7 +4,7 @@ library(ggplot2)
 library(terra)
 
 # other will be zero, trees =1, water =2, shrub =3, low =4
-classPr <- rast("/media/hkropp/research/Kolyma_Data/predictions/v2/maps/class1971_1.tif") 
+classPr <- rast("/media/hkropp/research/Kolyma_Data/predictions/v2/maps/class1971_5.tif") 
 pointsA1 <- vect("/media/hkropp/research/Kolyma_Data/valid/v2/valid_all/valid_20.shp")
 pointsA2 <- vect("/media/hkropp/research/Kolyma_Data/valid/v2/valid_all/valid_71.shp")
 
@@ -19,9 +19,9 @@ p_extract1 <- extract(classP, pointsA1, method="simple")
 
 tabA1 <- values(pointsA1)
 tabA1$classID <- ifelse(tabA1$class71 == "o", 0,
-                ifelse(tabA1$class71 == "ti", 1,
-                ifelse(tabA1$class71 == "w", 2,
-                ifelse(tabA1$class71 == "s", 3,NA))))
+                        ifelse(tabA1$class71 == "ti", 1,
+                               ifelse(tabA1$class71 == "w", 2,
+                                      ifelse(tabA1$class71 == "s", 3,NA))))
 
 tabA1$predID <- p_extract1[,2]
 
@@ -36,12 +36,12 @@ tabA2$classID <- ifelse(tabA2$Classes == "o", 0,
 tabA2$predID <- p_extract2[,2]
 
 
+
+
 tabA <- data.frame(classID = c(tabA1$classID, tabA2$classID),
                    predID= c(tabA1$predID, tabA2$predID))
 
 predict_pts <- na.omit(tabA)
-
-
 
 conf <- confusionMatrix(as.factor(predict_pts$predID), as.factor(predict_pts$classID))
 
@@ -81,18 +81,6 @@ ggplot(acc, aes(fill=type, y=percent, x=labels)) +
         panel.grid.minor = element_blank(),
         axis.title = element_text(size = 12.5)) + labs(x = "Classification", y = "Accuracy (%)") 
 
-
-
 acc
 conf$table
 overallAccuracy
-
-
-
-
-pointsComp <- pointsA
-pointsComp$predC <- tabA$predID 
-plot(pointsComp)
-head(values(pointsComp))
-pointsComp$ActualC <- tabA$classID
-writeVector(pointsComp,"/media/hkropp/research/Kolyma_Data/predictions/v2/maps/valid_class1971_1.shp")
