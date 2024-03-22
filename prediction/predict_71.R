@@ -4,7 +4,7 @@ library(dplyr)
 bound <- vect("/media/hkropp/research/Kolyma_Data/img_tiles/bound_71/na_bound_71e.shp")
 # Image merge ---------
 
-dirP <- "/media/hkropp/research/Kolyma_Data/predictions/v2/1971"
+dirP <- "/media/hkropp/research/Kolyma_Data/predictions/v2/1971_1"
 
 Nimg <- 3036
 
@@ -173,7 +173,7 @@ plot(treeLayer)
 
 # remove noise below set threshold
 
-#v2
+#
 treeMap <- ifel(treeLayer <= 0.3, 0, treeLayer)
 waterMap <- ifel(waterLayer <= 0.7, 0, waterLayer)
 shrubMap <- ifel(shrubLayer <= 0.4, 0, shrubLayer)
