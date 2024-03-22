@@ -80,3 +80,23 @@ acc
 
 conf$table
 overallAccuracy
+
+
+
+
+
+pointsComp1 <- pointsA1
+pointsComp1$predC <- tabA1$predID 
+pointsComp1$ActualC <- tabA1$classID
+
+pointsComp2 <- pointsA2
+pointsComp2$predC <- tabA2$predID 
+pointsComp2$ActualC <- tabA2$classID
+
+pointsComp <- union(pointsComp1, pointsComp2)
+tail(values(pointsComp))
+
+plot(pointsComp)
+head(values(pointsComp))
+
+writeVector(pointsComp,"/media/hkropp/research/Kolyma_Data/predictions/v2/maps/valid_class2020_k9_3.shp")
