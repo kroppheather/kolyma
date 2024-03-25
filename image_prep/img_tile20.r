@@ -112,3 +112,42 @@ tileI <- makeTiles(imgO1, c(256,256), "/media/hkropp/research/Kolyma_Data/img_ti
 imgO2 <- img[100:33723, 100:23595, drop=FALSE]
 plot(imgO2)
 tileI2 <- makeTiles(imgO2, c(256,256), "/media/hkropp/research/Kolyma_Data/img_tiles/2020/tiles_256_3/img_.tif")
+
+
+# add additional stratified sampling for the low density area
+
+
+
+
+stratE <- vect("K:/Environmental_Studies/hkropp/Private/siberia_wv/Kolyma/strat_20/strat_points.shp")
+
+xycell <- cells(img, stratE)
+
+
+rowi <- numeric()
+coli <- numeric()
+#training.check <- numeric()
+for(i in 1:20){
+  rowi[i] <- rowFromCell(img, xycell[i,2])
+  coli[i] <- colFromCell(img, xycell[i,2])
+}
+
+training.samples <- list()
+training.check <- numeric()
+for(i in 1:20){  
+  if(rowi[i] <= nrow(img)-255 & coli[i] <= ncol(img)-255){
+    training.samples[[i]] <-  img[rowi[i]:(rowi[i]+255), coli[i]:(coli[i]+255), drop=FALSE]
+    training.check[i] <- ifelse(is.na(mean(values(training.samples[[i]],mat=FALSE))) == TRUE,0,1)
+  }else{
+    training.samples[[i]] <- NA
+    training.check[i] <- 0
+  }
+}
+training.valid <- which(training.check == 1)
+
+plotRGB(training.samples[[2]], stretch="hist")
+length(training.valid)
+
+for(i in 1:20){
+  writeRaster(training.samples[[i]], paste0("K:/Environmental_Studies/hkropp/Private/siberia_wv/Kolyma/strat_20/img/img_",i+240,".tif"))
+} 
