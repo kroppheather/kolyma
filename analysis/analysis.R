@@ -40,3 +40,30 @@ water71 <- ifel(class71r == 2, 1, 0)
 shrub20 <- ifel(class20m == 3, 1, 0)
 taiga20 <- ifel(class20m == 1, 1, 0)
 water20 <- ifel(class20m == 2, 1, 0)
+
+
+woody71 <- ifel(class71r == 1 | class71r == 3 , 1, 0)
+
+woody20 <- ifel(class20m == 1 | class20m == 3 , 1, 0)
+
+
+# look at change in cover
+changeF <- function(x, y){
+  ifelse(x == 0 & y == 0, 0, # no cover either year
+         ifelse(x == 1 & y == 0, 1, # loss of cover
+                ifelse(x == 0 & y == 1, 2, # gain of cover
+                       ifelse(x == 1 & y == 1, 3, NA)))) # stable cover
+}
+
+woodyC <- c(woody71, woody20)
+
+woodyChange <- lapp(woodyC, fun=changeF)
+plot(woodyChange)
+
+
+shrubC <- c(shrub71, shrub20)
+
+shrubChange <- lapp(shrubC, fun=changeF)
+plot(shrubChange)
+
+
