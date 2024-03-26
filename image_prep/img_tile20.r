@@ -149,5 +149,5 @@ plotRGB(training.samples[[2]], stretch="hist")
 length(training.valid)
 
 for(i in 1:20){
-  writeRaster(training.samples[[i]], paste0("K:/Environmental_Studies/hkropp/Private/siberia_wv/Kolyma/strat_20/img/img_",i+240,".tif"))
+  writeRaster(training.samples[[i]], paste0("K:/Environmental_Studies/hkropp/Private/siberia_wv/Kolyma/strat_20/img/img_",i+225,".tif"))
 } 
