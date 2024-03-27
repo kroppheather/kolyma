@@ -8,11 +8,13 @@ library(caret)
 dirData <- "G:/My Drive/research/projects/Kolyma/final"
 
 class71 <- rast(paste0(dirData, "/class1971_6.tif"))
-class20 <- rast(paste0(dirData, "/class2020_k3_v2.tif"))
+class20 <- rast(paste0(dirData, "/class2020_strat_v2.tif"))
 bound <- vect(paste0(dirData,"/bound/na_bound_71e.shp"))
 
 valid71 <- st_read(paste0(dirData,"/valid/valid_class1971_6.shp"))
-valid20 <- st_read(paste0(dirData,"/valid/valid_class2020_2.shp"))
+valid20 <- st_read(paste0(dirData,"/valid/valid_class2020_strat_2.shp"))
+
+dem
 ###### read in data ----
 
 
@@ -65,5 +67,31 @@ shrubC <- c(shrub71, shrub20)
 
 shrubChange <- lapp(shrubC, fun=changeF)
 plot(shrubChange)
+
+# look at water related changes
+waterC <- c(water71, water20)
+waterChange <- lapp(waterC, fun=changeF)
+plot(waterChange)
+
+taigaC <- c(taiga71, taiga20)
+taigaChange <- lapp(taigaC, fun=changeF)
+plot(taigaChange)
+
+
+# x = water change and y = woody 20
+hydroChange <- function(x, y){
+  ifelse(x == 1 & y == 2 , 1, # gain of woody in water loss
+         ifelse(x == 2 & y== 1, 2,0)) #loss of woody to water gain
+  
+}
+
+
+
+hydroc <- c(waterChange, woodyChange)
+shrubHydro <- lapp(hydroc, hydroChange)
+# 1 = gain in woody cover due to water loss
+# 2 = loss of woody cover to gain of water
+# 3 = loss of water but no woody change
+plot(shrubHydro)
 
 
