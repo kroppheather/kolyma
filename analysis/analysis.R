@@ -14,17 +14,32 @@ bound <- vect(paste0(dirData,"/bound/na_bound_71e.shp"))
 valid71 <- st_read(paste0(dirData,"/valid/valid_class1971_6.shp"))
 valid20 <- st_read(paste0(dirData,"/valid/valid_class2020_strat_2.shp"))
 
-dem
-###### read in data ----
+dem <- rast("E:/Kolyma/dem/dem_mos.tif")
+
+img71 <- rast("E:/Kolyma/1971/ext_07_16_71.tif")
+img20 <- rast("E:/Kolyma/wv/wv8b_07_20.tif")
+
+###### figure director ----
+dirSave <- "G:/My Drive/research/projects/Kolyma/manuscript/figures"
+###### change maps and analysis ----
 
 
 plot(class71)
 plot(class20)
 
+# calculate frequency & percent occurance
+freq71 <- freq(class71)
+freq20 <- freq(class20)
+
+freq71$perc <- (freq71$count/sum(freq71$count))*100
+freq20$perc <- (freq20$count/sum(freq20$count))*100
 # set the same boundary for both
 
 class71m <- mask(class71, bound)
 class20m <- mask(class20, bound)
+
+img71m <- mask(img71, bound)
+img20m <- mask(img20, bound)
 
 
 # resample
@@ -94,4 +109,97 @@ shrubHydro <- lapp(hydroc, hydroChange)
 # 3 = loss of water but no woody change
 plot(shrubHydro)
 
+#shrub distance from water
+water20N <- ifel(water20 == 0, NA, 1)
+water71N <- ifel(water71 == 0, NA, 1)
+
+waterdist <- distance(water20N)
+waterdistM <- mask(waterdist, bound)
+plot(waterdistM)
+
+waterdist71 <- distance(water71N)
+waterdistM71 <- mask(waterdist71, bound)
+
+plot(waterdistM71)
+
+classZ <- matrix(c(0,0, NA,
+               0, 50, 1,
+               50,100,2,
+               100,150,3,
+               150,50000,4), byrow=TRUE, ncol=3)
+
+waterZones <- classify(waterdistM, classZ, include.lowest=FALSE)
+waterZones71 <- classify(waterdistM71, classZ, include.lowest=FALSE)
+plot(waterZones)
+plot(waterZones71)
+
+
+watZ71 <- zonal(woody71, waterZones71, fun="sum", na.rm=TRUE)
+zone71F <- freq(waterZones71)
+zone71F$woodyPix <- watZ71$mean.1
+zone71F$percW <- (zone71F$woodyPix /zone71F$count)*100
+
+
+watZ20 <- zonal(woody20, waterZones, fun="sum", na.rm=TRUE)
+zone20F <- freq(waterZones)
+zone20F$woodyPix <- watZ20$mean.1
+zone20F$percW <- (zone20F$woodyPix /zone20F$count)*100
+
+
+
+############ Figure variables -----
+colsClass <- c("white", "#FFB1AE", "#38AD11", "#0A4BD1")
+
+
+############ Figure 2: land cover maps and images -----
+
+
+
+# plot dim
+wd <- 2.5
+hd1 <- 2.5
+hd2 <- 2
+# arrow line width for scale bar
+awd <- 1
+# text size for scale bar
+sce <- 1.2
+#axis size for area plot
+cap <- 1
+# axis label size for area plot
+lax <- 1
+#border for bars
+borderi <- c("black",NA,NA,NA)
+#size for area text label
+tcx <- 1.2
+#panel label line
+llc <- -1
+#panel label size
+pcx <- 1
+
+png(paste0(dirSave, "/fig_2_cover_panel.png"), width=8.5, height=10, units="in", res=300)
+layout(matrix(seq(1,6),ncol=2), width=lcm(rep(wd*2.54,3)),height=lcm(c(hd1,hd1,hd2)*2.54))
+# 1971 imagery
+par(mai=c(0.01,0.01,0.01,0.01))
+plot(img71m, col=grey(1:100/100),axes=FALSE, mar=NA, legend=FALSE)
+    # maxcell=ncell(img71m))
+mtext("a", side=3, at=589000,  line=llc, cex=pcx)
+
+# 1971 land cover class
+par(mai=c(0.01,0.01,0.01,0.01))
+
+plot(class71m, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsClass,
+     legend=FALSE,  axes=FALSE, mar=NA)
+     #maxcell=ncell(class71m))
+
+par(mai=c(0.01,0.01,0.01,0.01))
+
+plot(c(0,1),c(0,1), xlim=c(0.5,4.5),ylim=c(0,60),
+     xlab= " ", ylab = " ", xaxs="i", yaxs="i",axes=FALSE,
+     type="n")
+for(i in 1:4){
+  polygon(c(i-0.25,i-0.25,i+0.25,i+0.25),
+          c(0,freq71$perc[i],freq71$perc[i],0),
+          col=colsClass[i], border=borderi[i])
+  
+}
 
