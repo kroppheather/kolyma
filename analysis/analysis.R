@@ -148,11 +148,11 @@ zone20F$percW <- (zone20F$woodyPix /zone20F$count)*100
 
 
 ############ Figure variables -----
-colsClass <- c("white", "#FFB1AE", "#38AD11", "#0A4BD1")
+colsClass <- c("white", "#FFB1AE", "#0A4BD1","#38AD11")
 
 
 ############ Figure 2: land cover maps and images -----
-
+img20str <- terra::stretch(img20m, minv=0, maxv=255, minq = 0.02, maxq=0.98)
 
 
 # plot dim
@@ -202,4 +202,30 @@ for(i in 1:4){
           col=colsClass[i], border=borderi[i])
   
 }
+# 2020 image
+par(mai=c(0.01,0.01,0.01,0.01))
+terra::stretch(img20m)
+               , axes=FALSE, mar=NA, legend=FALSE,  stretch="lin")
+# maxcell=ncell(img71m))
+mtext("a", side=3, at=589000,  line=llc, cex=pcx)
 
+# 1971 land cover class
+par(mai=c(0.01,0.01,0.01,0.01))
+
+plot(class20m, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsClass,
+     legend=FALSE,  axes=FALSE, mar=NA)
+#maxcell=ncell(class71m))
+
+par(mai=c(0.01,0.01,0.01,0.01))
+
+plot(c(0,1),c(0,1), xlim=c(0.5,4.5),ylim=c(0,60),
+     xlab= " ", ylab = " ", xaxs="i", yaxs="i",axes=FALSE,
+     type="n")
+for(i in 1:4){
+  polygon(c(i-0.25,i-0.25,i+0.25,i+0.25),
+          c(0,freq20$perc[i],freq20$perc[i],0),
+          col=colsClass[i], border=borderi[i])
+  
+}
+
+dev.off()
