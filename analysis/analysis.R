@@ -152,8 +152,16 @@ colsClass <- c("white", "#FFB1AE", "#0A4BD1","#38AD11")
 
 
 ############ Figure 2: land cover maps and images -----
-img20str <- terra::stretch(img20m, minv=0, maxv=255, minq = 0.02, maxq=0.98)
+#img20str <- terra::stretch(img20m, minv=0, maxv=255, minq = 0.005, maxq=0.995)
+img20cl <- c(img20$Red,img20$Green, img20$Blue)
+names(img20cl) <- c("R","G","B")
+img20RGB <- RGB(img20cl)
 
+x <- terra::colorize(img20cl, to="hsv")
+x$saturation <- x$saturation / 2
+RGB(x, type="hsv") <- 1:3
+rr <- colorize(x, to="rgb")
+plotRGB(rr)
 
 # plot dim
 wd <- 2.5
@@ -204,9 +212,8 @@ for(i in 1:4){
 }
 # 2020 image
 par(mai=c(0.01,0.01,0.01,0.01))
-terra::stretch(img20m)
-               , axes=FALSE, mar=NA, legend=FALSE,  stretch="lin")
-# maxcell=ncell(img71m))
+plotRGB(img20str, axes=FALSE, mar=NA, legend=FALSE)
+# maxcell=ncell(img20str))
 mtext("a", side=3, at=589000,  line=llc, cex=pcx)
 
 # 1971 land cover class
@@ -214,7 +221,7 @@ par(mai=c(0.01,0.01,0.01,0.01))
 
 plot(class20m, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsClass,
      legend=FALSE,  axes=FALSE, mar=NA)
-#maxcell=ncell(class71m))
+#maxcell=ncell(class20m))
 
 par(mai=c(0.01,0.01,0.01,0.01))
 
