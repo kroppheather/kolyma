@@ -154,7 +154,7 @@ colsClass <- c("white", "#FFB1AE", "#0A4BD1","#38AD11")
 ############ Figure 2: land cover maps and images -----
 
 # format raster so just RGB and in format needed
-img20cl <- c(img20$Red,img20$Green, img20$Blue)
+img20cl <- c(img20m$Red,img20m$Green, img20m$Blue)
 names(img20cl) <- c("R","G","B")
 RGB(img20cl) <- 1:3
 
@@ -163,11 +163,13 @@ x1 <- terra::colorize(img20cl, to="hsv", stretch=TRUE)
 # rename so can make adjustments without rerunning colorization
 x <- x1
 # reduce saturation
-x$saturation <- x$saturation / 1.25
+x$saturation <- x$saturation / 1.3
 # turn back to rgb
 RGB(x, type="hsv") <- 1:3
 rr <- colorize(x, to="rgb")
+#compare plotRGB for original and new image
 plotRGB(rr, stretch="lin")
+plotRGB(img20m, r=3, g=2, b= 1, stretch="lin")
 
 # plot dim
 wd <- 2.5
