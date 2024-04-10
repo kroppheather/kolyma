@@ -19,6 +19,9 @@ dem <- rast("E:/Kolyma/dem/dem_mos.tif")
 img71 <- rast("E:/Kolyma/1971/ext_07_16_71.tif")
 img20 <- rast("E:/Kolyma/wv/wv8b_07_20.tif")
 
+# comparision to change data:
+#boreal_greenness_median_percent_change_2000to2019_p500.tif
+
 ###### figure director ----
 dirSave <- "G:/My Drive/research/projects/Kolyma/manuscript/figures"
 ###### change maps and analysis ----
@@ -153,51 +156,45 @@ colsClass <- c("white", "#FFB1AE", "#0A4BD1","#38AD11")
 
 ############ Figure 2: land cover maps and images -----
 
-# format raster so just RGB and in format needed
-img20cl <- c(img20m$Red,img20m$Green, img20m$Blue)
-names(img20cl) <- c("R","G","B")
-RGB(img20cl) <- 1:3
-
-#convert rgb to hsv
-x1 <- terra::colorize(img20cl, to="hsv", stretch=TRUE)
-# rename so can make adjustments without rerunning colorization
-x <- x1
-# reduce saturation
-x$saturation <- x$saturation / 1.3
-# turn back to rgb
-RGB(x, type="hsv") <- 1:3
-rr <- colorize(x, to="rgb")
-#compare plotRGB for original and new image
-plotRGB(rr, stretch="lin")
-plotRGB(img20m, r=3, g=2, b= 1, stretch="lin")
 
 # plot dim
-wd <- 2.5
-hd1 <- 2.5
+wd <- 4
+hd1 <- 5
 hd2 <- 2
 # arrow line width for scale bar
-awd <- 1
+awd <- 2
 # text size for scale bar
-sce <- 1.2
+sce <- 2
 #axis size for area plot
-cap <- 1
+cap <- 2.5
 # axis label size for area plot
-lax <- 1
+lax <- 2
 #border for bars
 borderi <- c("black",NA,NA,NA)
 #size for area text label
 tcx <- 1.2
 #panel label line
-llc <- -1
+llc <- -1.75
 #panel label size
-pcx <- 1
+pcx <- 2
+# x type label
+capl <- 1.5
 
-png(paste0(dirSave, "/fig_2_cover_panel.png"), width=8.5, height=10, units="in", res=300)
+
+png(paste0(dirSave, "/fig_2_cover_panel.png"), width=14, height=14, units="in", res=300)
 layout(matrix(seq(1,6),ncol=2), width=lcm(rep(wd*2.54,3)),height=lcm(c(hd1,hd1,hd2)*2.54))
 # 1971 imagery
 par(mai=c(0.01,0.01,0.01,0.01))
-plot(img71m, col=grey(1:100/100),axes=FALSE, mar=NA, legend=FALSE)
-    # maxcell=ncell(img71m))
+plot(img71m, col=grey(1:100/100),axes=FALSE, mar=NA, legend=FALSE,
+     maxcell=ncell(img71m))
+
+arrows(588400,7625800, 589400, 7625800, code=0, lwd=awd)
+arrows(588400,7625300, 588400, 7625800, code=0, lwd=awd)
+arrows(589400,7625300, 589400, 7625800, code=0, lwd=awd)
+text(588400,7624800, "0", cex=sce)
+text(588900,7624000, "km", cex=sce)
+text(589400,7624800, "1", cex=sce)
+
 mtext("a", side=3, at=589000,  line=llc, cex=pcx)
 
 # 1971 land cover class
@@ -205,9 +202,11 @@ par(mai=c(0.01,0.01,0.01,0.01))
 
 plot(class71m, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsClass,
      legend=FALSE,  axes=FALSE, mar=NA)
+
+mtext("c", side=3, at=589000,  line=llc, cex=pcx)
      #maxcell=ncell(class71m))
 
-par(mai=c(0.01,0.01,0.01,0.01))
+par(mai=c(0.1,0.1,0.1,0.1))
 
 plot(c(0,1),c(0,1), xlim=c(0.5,4.5),ylim=c(0,60),
      xlab= " ", ylab = " ", xaxs="i", yaxs="i",axes=FALSE,
@@ -218,20 +217,33 @@ for(i in 1:4){
           col=colsClass[i], border=borderi[i])
   
 }
+mtext("e", side=3, at=0.8,  line=llc, cex=pcx)
+
+axis(1, seq(1,4),labels=c("","","",""), 
+     cex.axis=cap, lwd.ticks=1.5, lwd=2)
+axis(2, seq(0,60, by=20), las=2, cex.axis= cap , lwd.ticks=1.5, lwd=2)
+mtext("Land cover type", side=1, line=5, cex=lax )
+mtext("Percent Area (%)", side=2, line=4, cex=lax )
+
+mtext(c("Other","Taiga","Water","Shrub"), at=seq(1,4),side=1.5, cex=capl,
+      line=1)
+text(seq(1,4), freq71$perc+5, paste0(round(freq71$perc,1)), cex=1.5)
+
 # 2020 image
 par(mai=c(0.01,0.01,0.01,0.01))
 plotRGB(img20m, r=3, g=2, b= 1, stretch="lin", axes=FALSE, mar=NA, legend=FALSE)
 # maxcell=ncell(img20str))
-mtext("a", side=3, at=589000,  line=llc, cex=pcx)
+mtext("b", side=3, at=589000,  line=llc, cex=pcx)
 
-# 1971 land cover class
+# 2020 land cover class
 par(mai=c(0.01,0.01,0.01,0.01))
 
 plot(class20m, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsClass,
-     legend=FALSE,  axes=FALSE, mar=NA)
-#maxcell=ncell(class20m))
+     legend=FALSE,  axes=FALSE, mar=NA, maxcell=ncell(class20m))
 
-par(mai=c(0.01,0.01,0.01,0.01))
+mtext("d", side=3, at=589000,  line=llc, cex=pcx)
+
+par(mai=c(0.1,0.1,0.1,0.1))
 
 plot(c(0,1),c(0,1), xlim=c(0.5,4.5),ylim=c(0,60),
      xlab= " ", ylab = " ", xaxs="i", yaxs="i",axes=FALSE,
@@ -242,5 +254,14 @@ for(i in 1:4){
           col=colsClass[i], border=borderi[i])
   
 }
+mtext("f", side=3, at=0.8,  line=llc, cex=pcx)
 
+text(seq(1,4), freq20$perc+5, paste0(round(freq20$perc,1)), cex=1.5)
+
+axis(1, seq(1,4),labels=c("","","",""), 
+     cex.axis=cap, lwd.ticks=1.5, lwd=2)
+axis(2, seq(0,60, by=20), las=2, cex.axis= cap , lwd.ticks=1.5, lwd=2)
+mtext("Land cover type", side=1, line=5, cex=lax )
+mtext(c("Other","Taiga","Water","Shrub"), at=seq(1,4),side=1.5, cex=capl,
+      line=1)
 dev.off()
