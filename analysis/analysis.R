@@ -201,10 +201,9 @@ mtext("a", side=3, at=589000,  line=llc, cex=pcx)
 par(mai=c(0.01,0.01,0.01,0.01))
 
 plot(class71m, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsClass,
-     legend=FALSE,  axes=FALSE, mar=NA)
+     legend=FALSE,  axes=FALSE, mar=NA, maxcell=ncell(class71m))
 
 mtext("c", side=3, at=589000,  line=llc, cex=pcx)
-     #maxcell=ncell(class71m))
 
 par(mai=c(0.1,0.1,0.1,0.1))
 
@@ -231,8 +230,8 @@ text(seq(1,4), freq71$perc+5, paste0(round(freq71$perc,1)), cex=1.5)
 
 # 2020 image
 par(mai=c(0.01,0.01,0.01,0.01))
-plotRGB(img20m, r=3, g=2, b= 1, stretch="lin", axes=FALSE, mar=NA, legend=FALSE)
-# maxcell=ncell(img20str))
+plotRGB(img20m, r=3, g=2, b= 1, stretch="lin", axes=FALSE, mar=NA, legend=FALSE,
+        maxcell=ncell(img20m))
 mtext("b", side=3, at=589000,  line=llc, cex=pcx)
 
 # 2020 land cover class
