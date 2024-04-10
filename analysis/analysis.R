@@ -220,7 +220,7 @@ for(i in 1:4){
 }
 # 2020 image
 par(mai=c(0.01,0.01,0.01,0.01))
-plotRGB(img20str, axes=FALSE, mar=NA, legend=FALSE)
+plotRGB(img20m, r=3, g=2, b= 1, stretch="lin", axes=FALSE, mar=NA, legend=FALSE)
 # maxcell=ncell(img20str))
 mtext("a", side=3, at=589000,  line=llc, cex=pcx)
 
