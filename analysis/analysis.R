@@ -85,6 +85,7 @@ shrubC <- c(shrub71, shrub20)
 
 shrubChange <- lapp(shrubC, fun=changeF)
 plot(shrubChange)
+plot(waterChange)
 
 # look at water related changes
 waterC <- c(water71, water20)
@@ -115,12 +116,15 @@ plot(shrubHydro)
 #shrub distance from water
 water20N <- ifel(water20 == 0, NA, 1)
 water71N <- ifel(water71 == 0, NA, 1)
+water20V <- as.polygons(water20N)
 
-waterdist <- distance(water20N)
+waterdist <- distance(water20N, water20V)
 waterdistM <- mask(waterdist, bound)
 plot(waterdistM)
+plot(waterdist)
 
 waterdist71 <- distance(water71N)
+plot(waterdist71)
 waterdistM71 <- mask(waterdist71, bound)
 
 plot(waterdistM71)
@@ -150,10 +154,22 @@ zone20F$percW <- (zone20F$woodyPix /zone20F$count)*100
 
 
 
+
 ############ Figure variables -----
-colsClass <- c("white", "#FFB1AE", "#0A4BD1","#38AD11")
+colsClass <- c("white", "#A3C460", "#2B76D1","#117733")
+colsChangeW <- c("white", "#D88B09", "#AD728C","#2B76D1")
+colsChangeT <- c("white", "#D88B09", "#AD728C","#A3C460")
+colsChangeS <- c("white","#D88B09", "#AD728C","#07784B")
+colsChange <- c("white", "#D15230", "#7CB9FF", "#61605E")
 
+plot(shrubChange, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsChangeS,
+     legend=FALSE,  axes=FALSE, mar=NA) #maxcell=ncell(shrubChange))
 
+plot(class71m, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsClass,
+     legend=FALSE,  axes=FALSE, mar=NA)
+
+plot(shrubChange, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsChange,
+     legend=FALSE,  axes=FALSE, mar=NA)
 ############ Figure 2: land cover maps and images -----
 
 
@@ -264,3 +280,40 @@ mtext("Land cover type", side=1, line=5, cex=lax )
 mtext(c("Other","Taiga","Water","Shrub"), at=seq(1,4),side=1.5, cex=capl,
       line=1)
 dev.off()
+
+
+
+
+
+############ Figure 3: change maps
+
+
+# plot dim
+wd <- 4
+hd1 <- 5
+hd2 <- 2
+# arrow line width for scale bar
+awd <- 2
+# text size for scale bar
+sce <- 2
+#panel label line
+llc <- -1.75
+#panel label size
+pcx <- 2
+# x type label
+capl <- 1.5
+
+
+png(paste0(dirSave, "/fig_2_cover_panel.png"), width=14, height=7, units="in", res=300)
+layout(matrix(seq(1,3),ncol=3), width=lcm(rep(wd*2.54,1)),height=lcm(c(hd1,hd1,hd1)*2.54))
+# 1971 imagery
+par(mai=c(0.01,0.01,0.01,0.01))
+plot(waterChange, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsChangeW,
+     legend=FALSE,  axes=FALSE, mar=NA) #maxcell=ncell(waterChange))
+
+
+plot(shrubChange, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsChangeS,
+     legend=FALSE,  axes=FALSE, mar=NA) #maxcell=ncell(shrubChange))
+
+plot(taigaChange, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsChangeT,
+     legend=FALSE,  axes=FALSE, mar=NA) #maxcell=ncell(taigaChange))
