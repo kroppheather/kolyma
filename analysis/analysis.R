@@ -19,6 +19,8 @@ dem <- rast("E:/Kolyma/dem/dem_mos.tif")
 img71 <- rast("E:/Kolyma/1971/ext_07_16_71.tif")
 img20 <- rast("E:/Kolyma/wv/wv8b_07_20.tif")
 
+aoi <- vect("E:/Kolyma/aoi/aoi.shp")
+
 # comparision to change data:
 #boreal_greenness_median_percent_change_2000to2019_p500.tif
 
@@ -113,23 +115,18 @@ shrubHydro <- lapp(hydroc, hydroChange)
 # 3 = loss of water but no woody change
 plot(shrubHydro)
 
+water20N <- ifel(water20 == 0, NA, 1)
+water71N <- ifel(water71 == 0, NA, 1)
+writeRaster(water20N, "E:/Kolyma/distance/water20N.tif")
+writeRaster(water71N, "E:/Kolyma/distance/water71N.tif")
 
 ############ Figure variables -----
-colsClass <- c("white", "#A3C460", "#2B76D1","#117733")
-colsChangeW <- c("white", "#D88B09", "#AD728C","#2B76D1")
-colsChangeT <- c("white", "#D88B09", "#AD728C","#A3C460")
-colsChangeS <- c("white","#D88B09", "#AD728C","#07784B")
-colsChange <- c("white", "#D15230", "#7CB9FF", "#61605E")
-colsHydro <- c("white", "#118374", "#DB9CD5")
+colsClass <- c("#ECECDD", "#117835" , "#0336A3","#9CC20E")
+colsChange <- c("white", "#D15230", "#4393c3", "grey30")
+colsHydroChange <- c("white", "#4393c3","#D15230")
 
-plot(shrubChange, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsChange,
-     legend=FALSE,  axes=FALSE, mar=NA) #maxcell=ncell(shrubChange))
 
-plot(class71m, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsClass,
-     legend=FALSE,  axes=FALSE, mar=NA)
 
-plot(shrubChange, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsChange,
-     legend=FALSE,  axes=FALSE, mar=NA)
 ############ Figure 2: land cover maps and images -----
 
 
@@ -245,35 +242,201 @@ dev.off()
 
 
 
-############ Figure 3: change maps
+############ Figure 3: change maps ------
 
 
 # plot dim
 wd <- 4
 hd1 <- 5
-hd2 <- 2
+hd2 <- 0.5
 # arrow line width for scale bar
 awd <- 2
 # text size for scale bar
 sce <- 2
 #panel label line
-llc <- -1.75
+llc <- 0
+#panel label size
+pcx <- 2
+# map label line
+llcm <- 2
+# map label size
+mcx <- 2
+
+
+
+png(paste0(dirSave, "/fig_3_change_panel.png"), width=14, height=7, units="in", res=300)
+layout(matrix(seq(1,6),ncol=3, byrow=TRUE), width=lcm(rep(wd*2.54,1)),height=lcm(c(hd1,hd2)*2.54))
+# 1971 imagery
+par(mai=c(0.01,0.01,0.01,0.01))
+plot(waterChange, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsChange,
+     legend=FALSE,  axes=FALSE, mar=NA) #maxcell=ncell(waterChange))
+
+arrows(588400,7625800, 589400, 7625800, code=0, lwd=awd)
+arrows(588400,7625300, 588400, 7625800, code=0, lwd=awd)
+arrows(589400,7625300, 589400, 7625800, code=0, lwd=awd)
+text(588400,7624800, "0", cex=sce)
+text(588900,7624000, "km", cex=sce)
+text(589400,7624800, "1", cex=sce)
+mtext("a", side=3, at=589000,  line=llc, cex=pcx)
+mtext("Water", side=3,   line=llcm, cex=mcx)
+
+par(mai=c(0.01,0.01,0.01,0.01))
+
+plot(shrubChange, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsChange,
+     legend=FALSE,  axes=FALSE, mar=NA) #maxcell=ncell(shrubChange))
+
+mtext("b", side=3, at=589000,  line=llc, cex=pcx)
+mtext("Shrub", side=3,   line=llcm, cex=mcx)
+
+
+par(mai=c(0.01,0.01,0.01,0.01))
+
+plot(taigaChange, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsChange,
+     legend=FALSE,  axes=FALSE, mar=NA) #maxcell=ncell(taigaChange))
+
+mtext("c", side=3, at=589000,  line=llc, cex=pcx)
+mtext("Taiga", side=3,   line=llcm, cex=mcx)
+
+
+par(mai=c(0.01,0.01,0.01,0.01))
+plot(c(0,10),c(0,10), type="n", axes=FALSE, xlab=" ", ylab= " ")
+
+legend("center", c("no cover", "loss", "gain","stable"),
+       fill=colsChange, bty="n", horiz=TRUE, cex=1.4)
+
+par(mai=c(0.01,0.01,0.01,0.01))
+plot(c(0,10),c(0,10), type="n", axes=FALSE, xlab=" ", ylab= " ")
+legend("center", c("no cover", "loss", "gain","stable"),
+       fill=colsChange, bty="n", horiz=TRUE, cex=1.4)
+
+par(mai=c(0.01,0.01,0.01,0.01))
+plot(c(0,10),c(0,10), type="n", axes=FALSE, xlab=" ", ylab= " ")
+legend("center", c("no cover", "loss", "gain","stable"),
+       fill=colsChange, bty="n", horiz=TRUE, cex=1.4)
+
+dev.off()
+
+
+########### Figure 4: hydro change ------
+
+
+
+plot(aoi[1,])
+#prep aoi
+aoiWL <- aoi[3,]
+aoiWG <- aoi[2,]
+
+img71WL <- crop(img71m, aoiWL)
+img20WL <- crop(img20m, aoiWL)
+img71WG <- crop(img71m, aoiWG)
+img20WG <- crop(img20m, aoiWG)
+
+plot(img71WG, col=grey(1:100/100),axes=FALSE, mar=NA, legend=FALSE,
+     maxcell=ncell(img71m))
+plotRGB(img20WG, r=3, g=2, b= 1, stretch="lin", axes=FALSE, mar=NA, legend=FALSE,
+        maxcell=ncell(img20m))
+
+# plot dim
+wd <- 4
+hd1 <- 5
+hd2 <- 1
+# arrow line width for scale bar
+awd <- 2
+# text size for scale bar
+sce <- 1.5
+
+#panel label line
+llc <- -1.5
 #panel label size
 pcx <- 2
 # x type label
 capl <- 1.5
 
+png(paste0(dirSave, "/fig_4a_hydro_map.png"), width=6, height=8, units="in", res=300)
+layout(matrix(seq(1,2),ncol=1), width=lcm(rep(wd*2.54,3)),height=lcm(c(hd1, hd2)*2.54))
 
-png(paste0(dirSave, "/fig_2_cover_panel.png"), width=14, height=7, units="in", res=300)
-layout(matrix(seq(1,3),ncol=3), width=lcm(rep(wd*2.54,1)),height=lcm(c(hd1,hd1,hd1)*2.54))
+par(mai=c(0,0,0,0))
+# 1 = gain in woody cover due to water loss
+# 2 = loss of woody cover to gain of water
+# 3 = loss of water but no woody change
+plot(shrubHydro, breaks=c(-0.5,0.5,1.5,2.5),col=colsHydroChange,
+     legend=FALSE,  axes=FALSE, mar=NA) #maxcell=ncell(shrubHydro))
+polys(aoiWL,  col=NA, border="black")
+polys(aoiWG,  col=NA, border="black")
+text(594600,7621900, "AOI: b,c", cex=0.66) 
+text(591031,7621100, "AOI: d,e", cex=0.66)
+arrows(588400,7625800, 589400, 7625800, code=0, lwd=awd)
+arrows(588400,7625300, 588400, 7625800, code=0, lwd=awd)
+arrows(589400,7625300, 589400, 7625800, code=0, lwd=awd)
+text(588400,7624800, "0", cex=sce)
+text(588900,7624000, "km", cex=sce)
+text(589400,7624800, "1", cex=sce)
+mtext("a", side=3, at=589000,  line=llc, cex=pcx)
+
+
+par(mai=c(0.01,0.01,0.01,0.01))
+plot(c(0,10),c(0,10), type="n", axes=FALSE, xlab=" ", ylab= " ")
+legend("center", c("other", "+ woody & - water", "- woody & + water"),
+       fill=colsHydroChange, bty="n")
+dev.off()
+
+
+# part b
+
+
+# plot dim
+wd <- 4
+hd1 <- 4
+# arrow line width for scale bar
+awd <- 2
+# text size for scale bar
+sce <- 1.5
+
+#panel label line
+llc <- -2.5
+#panel label size
+pcx <- 3
+# x type label
+capl <- 1.5
+
+
+png(paste0(dirSave, "/fig_4b_change examples.png"), width=14, height=14, units="in", res=300)
+layout(matrix(seq(1,4),ncol=2, byrow=TRUE), width=lcm(rep(wd*2.54,3)),height=lcm(c(hd1,hd1)*2.54))
 # 1971 imagery
 par(mai=c(0.01,0.01,0.01,0.01))
-plot(waterChange, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsChangeW,
-     legend=FALSE,  axes=FALSE, mar=NA) #maxcell=ncell(waterChange))
 
+plot(img71WL, col=grey(1:100/100),axes=FALSE, mar=NA, legend=FALSE,
+     maxcell=ncell(img71WL))
 
-plot(shrubChange, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsChangeS,
-     legend=FALSE,  axes=FALSE, mar=NA) #maxcell=ncell(shrubChange))
+arrows(594800,7622250, 595000, 7622250, code=0, lwd=awd, col="white")
+arrows(594800,7622210, 594800, 7622250, code=0, lwd=awd, col="white")
+arrows(595000,7622210,  595000, 7622250, code=0, lwd=awd, col="white")
+text(594800,7622180, "0", cex=sce, col="white")
+text(594840,7622180, "m", cex=sce, col="white")
+text(595000,7622180, "200", cex=sce, col="white")
+mtext("b", side=3, at=594830,  line=llc, cex=pcx, col="white")
 
-plot(taigaChange, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsChangeT,
-     legend=FALSE,  axes=FALSE, mar=NA) #maxcell=ncell(taigaChange))
+par(mai=c(0.01,0.01,0.01,0.01))
+
+plotRGB(img20WL, r=3, g=2, b= 1, stretch="lin", axes=FALSE, mar=NA, legend=FALSE,
+        maxcell=ncell(img20m))
+mtext("c", side=3, at=594830,  line=llc, cex=pcx, col="white")
+par(mai=c(0.01,0.01,0.01,0.01))
+
+plot(img71WG, col=grey(1:100/100),axes=FALSE, mar=NA, legend=FALSE,
+     maxcell=ncell(img71WL))
+
+arrows(591175,7620775, 591225, 7620775, code=0, lwd=awd, col="white")
+arrows(591175,7620765, 591175, 7620775, code=0, lwd=awd, col="white")
+arrows(591225,7620765,  591225, 7620775, code=0, lwd=awd, col="white")
+text(591175,7620755, "0", cex=sce, col="white")
+text(591185,7620755, "m", cex=sce, col="white")
+text(591225,7620755, "50", cex=sce, col="white")
+
+mtext("d", side=3, at=591050,  line=llc, cex=pcx, col="white")
+par(mai=c(0.01,0.01,0.01,0.01))
+
+plotRGB(img20WG, r=3, g=2, b= 1, stretch="lin", axes=FALSE, mar=NA, legend=FALSE,
+        maxcell=ncell(img20m))
+mtext("e", side=3, at=591050,  line=llc, cex=pcx, col="white")
+dev.off()
