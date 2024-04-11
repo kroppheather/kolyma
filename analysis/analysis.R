@@ -113,47 +113,6 @@ shrubHydro <- lapp(hydroc, hydroChange)
 # 3 = loss of water but no woody change
 plot(shrubHydro)
 
-#shrub distance from water
-water20N <- ifel(water20 == 0, NA, 1)
-water71N <- ifel(water71 == 0, NA, 1)
-water20V <- as.polygons(water20N)
-
-waterdist <- distance(water20N, water20V)
-waterdistM <- mask(waterdist, bound)
-plot(waterdistM)
-plot(waterdist)
-
-waterdist71 <- distance(water71N)
-plot(waterdist71)
-waterdistM71 <- mask(waterdist71, bound)
-
-plot(waterdistM71)
-
-classZ <- matrix(c(0,0, NA,
-               0, 50, 1,
-               50,100,2,
-               100,150,3,
-               150,50000,4), byrow=TRUE, ncol=3)
-
-waterZones <- classify(waterdistM, classZ, include.lowest=FALSE)
-waterZones71 <- classify(waterdistM71, classZ, include.lowest=FALSE)
-plot(waterZones)
-plot(waterZones71)
-
-
-watZ71 <- zonal(woody71, waterZones71, fun="sum", na.rm=TRUE)
-zone71F <- freq(waterZones71)
-zone71F$woodyPix <- watZ71$mean.1
-zone71F$percW <- (zone71F$woodyPix /zone71F$count)*100
-
-
-watZ20 <- zonal(woody20, waterZones, fun="sum", na.rm=TRUE)
-zone20F <- freq(waterZones)
-zone20F$woodyPix <- watZ20$mean.1
-zone20F$percW <- (zone20F$woodyPix /zone20F$count)*100
-
-
-
 
 ############ Figure variables -----
 colsClass <- c("white", "#A3C460", "#2B76D1","#117733")
@@ -161,8 +120,9 @@ colsChangeW <- c("white", "#D88B09", "#AD728C","#2B76D1")
 colsChangeT <- c("white", "#D88B09", "#AD728C","#A3C460")
 colsChangeS <- c("white","#D88B09", "#AD728C","#07784B")
 colsChange <- c("white", "#D15230", "#7CB9FF", "#61605E")
+colsHydro <- c("white", "#118374", "#DB9CD5")
 
-plot(shrubChange, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsChangeS,
+plot(shrubChange, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsChange,
      legend=FALSE,  axes=FALSE, mar=NA) #maxcell=ncell(shrubChange))
 
 plot(class71m, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsClass,
