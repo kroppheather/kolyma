@@ -21,6 +21,10 @@ img20 <- rast("E:/Kolyma/wv/wv8b_07_20.tif")
 
 aoi <- vect("E:/Kolyma/aoi/aoi.shp")
 
+# Distance calculation from ArcGIS (after terra update broke the function)
+distW20w <- rast("E:/Kolyma/distance/dist_20N.tif")
+distW71w <- rast("E:/Kolyma/distance/dist_water71N.tif")
+plot(distW20w)
 # comparision to change data:
 #boreal_greenness_median_percent_change_2000to2019_p500.tif
 
@@ -46,6 +50,8 @@ class20m <- mask(class20, bound)
 img71m <- mask(img71, bound)
 img20m <- mask(img20, bound)
 
+distW20 <- mask(distW20w, bound)
+distW71 <- mask(distW71w, bound)
 
 # resample
 class71r <- resample(class71m, class20m, method="near")
@@ -117,8 +123,36 @@ plot(shrubHydro)
 
 water20N <- ifel(water20 == 0, NA, 1)
 water71N <- ifel(water71 == 0, NA, 1)
-writeRaster(water20N, "E:/Kolyma/distance/water20N.tif")
-writeRaster(water71N, "E:/Kolyma/distance/water71N.tif")
+#writeRaster(water20N, "E:/Kolyma/distance/water20N.tif")
+#writeRaster(water71N, "E:/Kolyma/distance/water71N.tif")
+
+
+classZ <- matrix(c(0,0, NA,
+                   0, 50, 1,
+                   50,100,2,
+                   100,5000,3), byrow=TRUE, ncol=3)
+
+waterZones20 <- classify(distW20, classZ, include.lowest=FALSE)
+waterZones71 <- classify(distW71, classZ, include.lowest=FALSE)
+plot(waterZones20)
+plot(waterZones71)
+
+
+taigZ71 <- zonal(taiga71, waterZones71, fun="sum", na.rm=TRUE)
+zone71F <- freq(waterZones71)
+zone71F$taigaPix <- taigZ71$mean
+zone71F$percTaig <- (zone71F$taigaPix /zone71F$count)*100
+shrubz71 <- zonal(shrub71, waterZones71, fun="sum", na.rm=TRUE)
+zone71F$shrubPix <- shrubz71$mean
+zone71F$percshrub <- (zone71F$shrubPix /zone71F$count)*100
+
+taigZ20 <- zonal(taiga20, waterZones20, fun="sum", na.rm=TRUE)
+zone20F <- freq(waterZones20)
+zone20F$taigaPix <- taigZ20$mean
+zone20F$percTaig <- (zone20F$taigaPix /zone20F$count)*100
+shrubz20 <- zonal(shrub20, waterZones20, fun="sum", na.rm=TRUE)
+zone20F$shrubPix <- shrubz20$mean
+zone20F$percshrub <- (zone20F$shrubPix /zone20F$count)*100
 
 ############ Figure variables -----
 colsClass <- c("#ECECDD", "#117835" , "#0336A3","#9CC20E")
@@ -439,6 +473,73 @@ par(mai=c(0.01,0.01,0.01,0.01))
 plotRGB(img20WG, r=3, g=2, b= 1, stretch="lin", axes=FALSE, mar=NA, legend=FALSE,
         maxcell=ncell(img20m))
 mtext("e", side=3, at=591050,  line=llc, cex=pcx, col="white")
+dev.off()
+
+
+
+
+########### Figure 5: shrub and taiga coverage near water
+
+wd1 <- 8
+hd1 <- 8
+x71 <- c(1,4,7)
+x20 <- c(2,5,8)
+
+png(paste0(dirSave, "/prox_water.png"), width=10, height=10, units="in", res=300)
+layout(matrix(seq(1),ncol=1), width=lcm(c(wd1)*2.54),height=lcm(c(hd1)*2.54))
+
+
+plot(c(0.5,3.5), c(0, 60), ylim=c(0,61), xlim=c(0,9),
+     type="n", axes=FALSE, yaxs="i", xaxs="i",
+     xlab = " ", ylab= " ")
+
+for(i in 1:3){
+  polygon(c(x71[i]-0.25,x71[i]-0.25,x71[i]+0.25,x71[i]+0.25),
+          c(0, zone71F$percTaig[i+1],zone71F$percTaig[i+1],0),
+          col=colsClass[2], border=NA)
+}
+
+for(i in 1:3){
+  polygon(c(x71[i]-0.25,x71[i]-0.25,x71[i]+0.25,x71[i]+0.25),
+          c(zone71F$percTaig[i+1], zone71F$percTaig[i+1]+zone71F$percshrub[i+1],
+            zone71F$percTaig[i+1]+zone71F$percshrub[i+1],zone71F$percTaig[i+1]),
+          col=colsClass[4], border=NA)
+}
+
+for(i in 1:3){
+  polygon(c(x20[i]-0.25,x20[i]-0.25,x20[i]+0.25,x20[i]+0.25),
+          c(0, zone20F$percTaig[i+1],zone20F$percTaig[i+1],0),
+          col=colsClass[2], border=NA)
+}
+
+for(i in 1:3){
+  polygon(c(x20[i]-0.25,x20[i]-0.25,x20[i]+0.25,x20[i]+0.25),
+          c(zone20F$percTaig[i+1], zone20F$percTaig[i+1]+zone20F$percshrub[i+1],
+            zone20F$percTaig[i+1]+zone20F$percshrub[i+1],zone20F$percTaig[i+1]),
+          col=colsClass[4], border=NA)
+}
+
+text(x20, zone20F$percTaig[2:4]-2, paste(round(zone20F$percTaig[2:4])), 
+     cex=1.5, col="white")
+text(x71,  zone71F$percTaig[2:4]-2, paste(round(zone71F$percTaig[2:4])),
+     cex=1.5, col="white")
+text(x71,  zone71F$percTaig[2:4]+ zone71F$percshrub[2:4]-2, 
+                    paste(round(zone71F$percshrub[2:4])), cex=1.5, col="white")
+text(x20,  zone20F$percTaig[2:4]+ zone20F$percshrub[2:4]-2, 
+     paste(round(zone20F$percshrub[2:4])), cex=1.5, col="white")
+
+axis(1, c(-1,1,2,4,5,7,8,11), c("","1971","2020","1971","2020","1971","2020",""), 
+     cex.axis=1.25)
+axis(2, seq(0,60, by=10), las=2, cex.axis=1.25) 
+mtext( "Percent area with cover (%)",side=2, line=3, cex=2)
+mtext("0-50 m", side=1, at=1.5,line=2.75, cex=1.75)
+mtext("50-100 m", side=1, at=4.5,line=2.75, cex=1.75)
+mtext(">100 m", side=1, at=7.5,line=2.75, cex=1.75)
+
+mtext("Proximity to surface water",side=1, line=4.5, cex=2)
+legend("topright", c("taiga", "shrub"),
+       fill=c(colsClass[2],colsClass[4]), bty="n", cex=1.75)
+
 dev.off()
 
 
