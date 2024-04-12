@@ -269,7 +269,7 @@ layout(matrix(seq(1,6),ncol=3, byrow=TRUE), width=lcm(rep(wd*2.54,1)),height=lcm
 # 1971 imagery
 par(mai=c(0.01,0.01,0.01,0.01))
 plot(waterChange, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsChange,
-     legend=FALSE,  axes=FALSE, mar=NA) #maxcell=ncell(waterChange))
+     legend=FALSE,  axes=FALSE, mar=NA, maxcell=ncell(waterChange))
 
 arrows(588400,7625800, 589400, 7625800, code=0, lwd=awd)
 arrows(588400,7625300, 588400, 7625800, code=0, lwd=awd)
@@ -283,7 +283,7 @@ mtext("Water", side=3,   line=llcm, cex=mcx)
 par(mai=c(0.01,0.01,0.01,0.01))
 
 plot(shrubChange, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsChange,
-     legend=FALSE,  axes=FALSE, mar=NA) #maxcell=ncell(shrubChange))
+     legend=FALSE,  axes=FALSE, mar=NA, maxcell=ncell(shrubChange))
 
 mtext("b", side=3, at=589000,  line=llc, cex=pcx)
 mtext("Shrub", side=3,   line=llcm, cex=mcx)
@@ -292,7 +292,7 @@ mtext("Shrub", side=3,   line=llcm, cex=mcx)
 par(mai=c(0.01,0.01,0.01,0.01))
 
 plot(taigaChange, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsChange,
-     legend=FALSE,  axes=FALSE, mar=NA) #maxcell=ncell(taigaChange))
+     legend=FALSE,  axes=FALSE, mar=NA, maxcell=ncell(taigaChange))
 
 mtext("c", side=3, at=589000,  line=llc, cex=pcx)
 mtext("Taiga", side=3,   line=llcm, cex=mcx)
@@ -440,3 +440,183 @@ plotRGB(img20WG, r=3, g=2, b= 1, stretch="lin", axes=FALSE, mar=NA, legend=FALSE
         maxcell=ncell(img20m))
 mtext("e", side=3, at=591050,  line=llc, cex=pcx, col="white")
 dev.off()
+
+
+
+########### Figure Supplement: examples of changes -----
+# taiga loss
+aoiTL <- aoi[1,]
+# shrub gain
+aoiSG <- aoi[4,]
+# taiga gain
+aoiTG <- aoi[5,]
+# shrub loss
+aoiSL <- aoi[6,]
+
+
+
+img71TL <- crop(img71m, aoiTL)
+img20TL <- crop(img20m, aoiTL)
+lc71TL <- crop(class71m, aoiTL)
+lc20TL <- crop(class20m, aoiTL)
+
+img71SG <- crop(img71m, aoiSG)
+img20SG <- crop(img20m, aoiSG)
+lc71SG <- crop(class71m, aoiSG)
+lc20SG <- crop(class20m, aoiSG)
+
+
+img71TG <- crop(img71m, aoiTG)
+img20TG <- crop(img20m, aoiTG)
+lc71TG <- crop(class71m, aoiTG)
+lc20TG <- crop(class20m, aoiTG)
+
+img71SL <- crop(img71m, aoiSL)
+img20SL <- crop(img20m, aoiSL)
+lc71SL <- crop(class71m, aoiSL)
+lc20SL <- crop(class20m, aoiSL)
+
+
+# plot dim
+wd <- 4
+hd1 <- 4
+# arrow line width for scale bar
+awd <- 2
+# text size for scale bar
+sce <- 3
+
+#panel label line
+llc <- -3.5
+#panel label size
+pcx <- 3
+# x type label
+capl <- 1.5
+# scale bar color
+scb <- "white"
+# panel label color
+pcc <- "white"
+
+
+png(paste0(dirSave, "/fig_supplement_change examples.png"), width=20, height=20, units="in", res=300)
+layout(matrix(seq(1,16),ncol=4, byrow=TRUE), 
+       width=lcm(rep(wd*2.54,4)),height=lcm(c(hd1,hd1, hd1,hd1)*2.54))
+
+### Taiga loss
+# 1971 imagery
+par(mai=c(0.01,0.01,0.01,0.01))
+
+plot(img71TL, col=grey(1:100/100),axes=FALSE, mar=NA, legend=FALSE,
+     maxcell=ncell(img71TL))
+mtext("a", side=3, at=597660,  line=llc, cex=pcx, col=pcc)
+arrows(597660,7622155, 597680, 7622155, code=0, lwd=awd, col=scb)
+arrows(597660,7622151, 597660, 7622155, code=0, lwd=awd, col=scb)
+arrows(597680,7622151, 597680, 7622155, code=0, lwd=awd, col=scb)
+text(597660,7622149, "0", cex=sce, col=scb)
+text(597665,7622149, "m", cex=sce, col=scb)
+text(597680,7622149, "20", cex=sce, col=scb)
+
+# 1971 class
+plot(lc71TL, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsClass,
+     legend=FALSE,  axes=FALSE, mar=NA, maxcell=ncell(lc71TL))
+mtext("b", side=3, at=597660,  line=llc, cex=pcx, col=pcc)
+# 2020 imagery
+par(mai=c(0.01,0.01,0.01,0.01))
+plotRGB(img20TL, r=3, g=2, b= 1, stretch="lin", axes=FALSE, mar=NA, legend=FALSE,
+        maxcell=ncell(img20TL))
+mtext("c", side=3, at=597660,  line=llc, cex=pcx, col=pcc)
+# 2020 class
+par(mai=c(0.01,0.01,0.01,0.01))
+plot(lc20TL, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsClass,
+     legend=FALSE,  axes=FALSE, mar=NA, maxcell=ncell(lc20TL))
+mtext("d", side=3, at=597660,  line=llc, cex=pcx, col=pcc)
+### taiga gain
+# 1971 imagery
+par(mai=c(0.01,0.01,0.01,0.01))
+
+plot(img71TG, col=grey(1:100/100),axes=FALSE, mar=NA, legend=FALSE,
+     maxcell=ncell(img71TG))
+mtext("e", side=3, at=592200,  line=llc, cex=pcx, col=pcc)
+
+arrows(592200,7621425, 592275, 7621425, code=0, lwd=awd, col=scb)
+arrows(592200,7621415, 592200, 7621425, code=0, lwd=awd, col=scb)
+arrows(592275,7621415, 592275, 7621425, code=0, lwd=awd, col=scb)
+text(592200,7621401, "0", cex=sce, col=scb)
+text(592220,7621401, "m", cex=sce, col=scb)
+text(592275,7621401, "75", cex=sce, col=scb)
+# 1971 class
+plot(lc71TG, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsClass,
+     legend=FALSE,  axes=FALSE, mar=NA, maxcell=ncell(lc71TG))
+mtext("f", side=3, at=592200,  line=llc, cex=pcx, col=pcc)
+# 2020 imagery
+par(mai=c(0.01,0.01,0.01,0.01))
+plotRGB(img20TG, r=3, g=2, b= 1, stretch="lin", axes=FALSE, mar=NA, legend=FALSE,
+        maxcell=ncell(img20TG))
+mtext("g", side=3, at=592200,  line=llc, cex=pcx, col=pcc)
+# 2020 class
+par(mai=c(0.01,0.01,0.01,0.01))
+plot(lc20TG, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsClass,
+     legend=FALSE,  axes=FALSE, mar=NA, maxcell=ncell(lc20TG))
+
+mtext("h", side=3, at=592200,  line=llc, cex=pcx, col=pcc)
+
+### shrub loss
+# 1971 imagery
+par(mai=c(0.01,0.01,0.01,0.01))
+
+plot(img71SL, col=grey(1:100/100),axes=FALSE, mar=NA, legend=FALSE,
+     maxcell=ncell(img71SL))
+
+arrows(593700,7615750, 593750, 7615750, code=0, lwd=awd, col="white")
+arrows(593700,7615730, 593700, 7615750, code=0, lwd=awd, col="white")
+arrows(593750,7615730, 593750, 7615750, code=0, lwd=awd, col="white")
+text(593700,7615720, "0", cex=sce, col="white")
+text(593720,7615720, "m", cex=sce, col="white")
+text(593750,7615720, "50", cex=sce, col="white")
+
+mtext("i", side=3, at=593660,  line=llc, cex=pcx, col=pcc)
+# 1971 class
+plot(lc71SL, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsClass,
+     legend=FALSE,  axes=FALSE, mar=NA, maxcell=ncell(lc71SL))
+mtext("j", side=3, at=593660,  line=llc, cex=pcx, col=pcc)
+# 2020 imagery
+par(mai=c(0.01,0.01,0.01,0.01))
+plotRGB(img20SL, r=3, g=2, b= 1, stretch="lin", axes=FALSE, mar=NA, legend=FALSE,
+        maxcell=ncell(img20SL))
+mtext("k", side=3, at=593660,  line=llc, cex=pcx, col=pcc)
+# 2020 class
+par(mai=c(0.01,0.01,0.01,0.01))
+plot(lc20SL, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsClass,
+     legend=FALSE,  axes=FALSE, mar=NA, maxcell=ncell(lc20SL))
+
+mtext("l", side=3, at=593660,  line=llc, cex=pcx, col=pcc)
+### shrub gain
+# 1971 imagery
+par(mai=c(0.01,0.01,0.01,0.01))
+
+plot(img71SG, col=grey(1:100/100),axes=FALSE, mar=NA, legend=FALSE,
+     maxcell=ncell(img71SG))
+mtext("m", side=3, at=593800,  line=llc, cex=pcx, col=pcc)
+
+arrows(593810,7614910, 593860, 7614910, code=0, lwd=awd, col=scb)
+arrows(593810,7614900, 593810, 7614910, code=0, lwd=awd, col=scb)
+arrows(593860,7614900, 593860, 7614910, code=0, lwd=awd, col=scb)
+text(593810,7614890, "0", cex=sce, col=scb)
+text(593825,7614890, "m", cex=sce, col=scb)
+text(593860,7614890, "50", cex=sce, col=scb)
+
+# 1971 class
+plot(lc71SG, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsClass,
+     legend=FALSE,  axes=FALSE, mar=NA, maxcell=ncell(lc71SL))
+mtext("n", side=3, at=593800,  line=llc, cex=pcx, col=pcc)
+# 2020 imagery
+par(mai=c(0.01,0.01,0.01,0.01))
+plotRGB(img20SG, r=3, g=2, b= 1, stretch="lin", axes=FALSE, mar=NA, legend=FALSE,
+        maxcell=ncell(img20SG))
+mtext("o", side=3, at=593800,  line=llc, cex=pcx, col=pcc)
+# 2020 class
+par(mai=c(0.01,0.01,0.01,0.01))
+plot(lc20SG, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsClass,
+     legend=FALSE,  axes=FALSE, mar=NA, maxcell=ncell(lc20SG))
+mtext("p", side=3, at=593800,  line=llc, cex=pcx, col=pcc)
+dev.off()
+
