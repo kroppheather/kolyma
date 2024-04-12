@@ -2,7 +2,7 @@ library(terra)
 library(dplyr)
 library(sf)
 library(caret)
-
+library(exactextractr)
 
 ###### read in data ----
 dirData <- "G:/My Drive/research/projects/Kolyma/final"
@@ -26,8 +26,9 @@ distW20w <- rast("E:/Kolyma/distance/dist_20N.tif")
 distW71w <- rast("E:/Kolyma/distance/dist_water71N.tif")
 plot(distW20w)
 # comparision to change data:
-#boreal_greenness_median_percent_change_2000to2019_p500.tif
+greenComp <- rast("E:/Kolyma/BorealForest_Greenness_Trends_2023/BorealForest_Greenness_Trends_2023/data/boreal_greenness_median_percent_change_2000to2019_p500.tif")
 
+plot(greenComp)
 ###### figure director ----
 dirSave <- "G:/My Drive/research/projects/Kolyma/manuscript/figures"
 ###### change maps and analysis ----
@@ -153,6 +154,59 @@ zone20F$percTaig <- (zone20F$taigaPix /zone20F$count)*100
 shrubz20 <- zonal(shrub20, waterZones20, fun="sum", na.rm=TRUE)
 zone20F$shrubPix <- shrubz20$mean
 zone20F$percshrub <- (zone20F$shrubPix /zone20F$count)*100
+
+# comparision to trends
+greenCompP <- project(greenComp, crs(class71m))
+plot(greenCompP)
+res(greenCompP)
+greenCompC <- crop(greenCompP, class71m)
+plot(greenCompC)
+
+
+classV71 <- as.polygons(class71, aggregate=TRUE, na.rm=TRUE)
+shrubV71 <- subset(classV71, classV71$mean == 3)
+plot(shrubV71, col="green", border=NA)
+shrubV71s <- st_as_sf(shrubV71)
+plot(shrubV71s)
+
+
+covS71 <- exact_extract(greenCompC, shrubV71s, include_cell=TRUE)
+covS71d <- data.frame(covS71[[1]])
+comp71J <- values(greenCompC, mat=FALSE, dataframe=TRUE)
+comp71J$cell <- 1:nrow(comp71J)
+covs71A <- left_join(comp71J, covS71d, by="cell")
+covs71A$percCov <- ifelse(is.na(covs71A$coverage_fraction),0,
+                          covs71A$coverage_fraction*100)
+perc71comp <- greenCompC
+plot(perc71comp)
+values(perc71comp) <- covs71A$percCov
+plot(perc71comp)
+
+classV20 <- as.polygons(class20, aggregate=TRUE, na.rm=TRUE)
+shrubV20 <- subset(classV20, classV20$mean == 3)
+shrubV20s <- st_as_sf(shrubV20)
+
+
+covS20 <- exact_extract(greenCompC, shrubV20s, include_cell=TRUE)
+covS20d <- data.frame(covS20[[1]])
+comp20J <- values(greenCompC, mat=FALSE, dataframe=TRUE)
+comp20J$cell <- 1:nrow(comp20J)
+covs20A <- left_join(comp20J, covS20d, by="cell")
+covs20A$percCov <- ifelse(is.na(covs20A$coverage_fraction),0,
+                          covs20A$coverage_fraction*100)
+perc20comp <- greenCompC
+plot(perc20comp)
+values(perc20comp) <- covs20A$percCov
+plot(perc20comp)
+
+changePercShrub <- perc20comp - perc71comp
+plot(changePercShrub)
+plot(greenCompC)
+names(changePercShrub) <- "percShrubC"
+greenStack <- c(greenCompC, changePercShrub)
+
+greenCompDF <- values(greenStack, dataframe=TRUE)
+plot(greenCompDF$percShrubC, greenCompDF$boreal_greenness_median_percent_change_2000to2019_p500)
 
 ############ Figure variables -----
 colsClass <- c("#ECECDD", "#117835" , "#0336A3","#9CC20E")
