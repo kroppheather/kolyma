@@ -127,6 +127,7 @@ water71N <- ifel(water71 == 0, NA, 1)
 #writeRaster(water20N, "E:/Kolyma/distance/water20N.tif")
 #writeRaster(water71N, "E:/Kolyma/distance/water71N.tif")
 
+# woody cover near rivers
 
 classZ <- matrix(c(0,0, NA,
                    0, 50, 1,
@@ -212,6 +213,29 @@ par(mfrow=c(1,3))
 plot(greenCompC)
 plot(changePercShrub)
 plot(shrubChange, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsChange)
+
+# look at landscape characteristics distribution w shrub/other
+
+dempP <- project(dem, crs(class71m))
+demC <- crop(dempP, class71m)
+plot(demC)
+
+plot(class71r)
+plot(class20m)
+
+shrubTChange <- function(x, y){
+  ifelse(x == 0 & y == 0 , 1, # always other
+         ifelse(x == 3 & y== 3, 2, # stable shrub
+                ifelse(x == 0 & y == 3,3,#new shrub other
+                       ifelse(x == 1 & y == 3,3,#new shrub taiga
+                        ifelse(x == 2 & y == 3,3, 0))))) # new shrub from water
+  
+}
+
+
+classC <- c(class71r, class20m)
+shrubChangeC <- lapp(classC, fun=shrubTChange)
+plot(shrubChangeC)
 
 
 ############ Figure variables -----
