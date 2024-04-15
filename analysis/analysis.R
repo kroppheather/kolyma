@@ -208,6 +208,12 @@ greenStack <- c(greenCompC, changePercShrub)
 greenCompDF <- values(greenStack, dataframe=TRUE)
 plot(greenCompDF$percShrubC, greenCompDF$boreal_greenness_median_percent_change_2000to2019_p500)
 
+par(mfrow=c(1,3))
+plot(greenCompC)
+plot(changePercShrub)
+plot(shrubChange, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsChange)
+
+
 ############ Figure variables -----
 colsClass <- c("#ECECDD", "#117835" , "#0336A3","#9CC20E")
 colsChange <- c("white", "#D15230", "#4393c3", "grey30")
@@ -532,7 +538,7 @@ dev.off()
 
 
 
-########### Figure 5: shrub and taiga coverage near water
+########### Figure 5: shrub and taiga coverage near water -----
 
 wd1 <- 8
 hd1 <- 8
