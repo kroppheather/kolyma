@@ -156,6 +156,8 @@ shrubz20 <- zonal(shrub20, waterZones20, fun="sum", na.rm=TRUE)
 zone20F$shrubPix <- shrubz20$mean
 zone20F$percshrub <- (zone20F$shrubPix /zone20F$count)*100
 
+
+######### Exploratory data analysis -----
 # comparision to trends
 greenCompP <- project(greenComp, crs(class71m))
 plot(greenCompP)
@@ -237,6 +239,37 @@ classC <- c(class71r, class20m)
 shrubChangeC <- lapp(classC, fun=shrubTChange)
 plot(shrubChangeC)
 
+terrainK <- terrain(demC)
+aspectK <- terrain(demC,v="aspect", unit="degrees")
+plot(terrainK)
+plot(aspectK)
+
+
+plot(demC)
+demCr <- terra::resample(demC, shrubChangeC)
+aspectKr <- terra::resample(aspectK, shrubChangeC)
+terrainKr <- terra::resample(terrainK, shrubChangeC)
+stackSt <- c(shrubChangeC, demCr, terrainKr, aspectKr)
+
+shrubDFc <- terra::values(stackSt, data.frame=TRUE)
+names(shrubDFc) <- c("shrubC", "dem","slope","aspect")
+noShrub <- shrubDFc[shrubDFc[,1] == 1,]
+
+gainShrub <- shrubDFc[shrubDFc[,1] == 3,]
+
+stableShrub <- shrubDFc[shrubDFc[,1] == 2,]
+
+hist(gainShrub[,2])
+hist(noShrub[,2])
+hist(stableShrub[,2])
+
+hist(gainShrub[,3])
+hist(noShrub[,3])
+hist(stableShrub[,3])
+
+hist(gainShrub[,4])
+hist(noShrub[,4])
+hist(stableShrub[,4])
 
 ############ Figure variables -----
 colsClass <- c("#ECECDD", "#117835" , "#0336A3","#9CC20E")
