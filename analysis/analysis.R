@@ -3,6 +3,7 @@ library(dplyr)
 library(sf)
 library(caret)
 library(exactextractr)
+library(gt)
 
 ###### read in data ----
 dirData <- "G:/My Drive/research/projects/Kolyma/final"
@@ -94,7 +95,7 @@ shrubC <- c(shrub71, shrub20)
 
 shrubChange <- lapp(shrubC, fun=changeF)
 plot(shrubChange)
-plot(waterChange)
+
 
 # look at water related changes
 waterC <- c(water71, water20)
@@ -156,6 +157,16 @@ shrubz20 <- zonal(shrub20, waterZones20, fun="sum", na.rm=TRUE)
 zone20F$shrubPix <- shrubz20$mean
 zone20F$percshrub <- (zone20F$shrubPix /zone20F$count)*100
 
+
+# validation table
+
+conf71 <- confusionMatrix(as.factor(valid71$predC),
+                           as.factor(valid71$ActualC))
+
+conf20 <- confusionMatrix(as.factor(valid20$predC),
+                          as.factor(valid20$ActualC))
+conf20$overall
+conf71$overall
 
 ######### Exploratory data analysis -----
 # comparision to trends
