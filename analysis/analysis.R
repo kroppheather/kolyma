@@ -168,6 +168,93 @@ conf20 <- confusionMatrix(as.factor(valid20$predC),
 conf20$overall
 conf71$overall
 
+
+other_PA71 <- conf71$table[1,1]/sum(conf71$table[,1])
+tree_PA71 <-  conf71$table[2,2]/sum(conf71$table[,2])
+water_PA71 <-  conf71$table[3,3]/sum(conf71$table[,3])
+shrub_PA71 <-  conf71$table[4,4]/sum(conf71$table[,4])
+
+
+other_UA71 <- conf71$table[1,1]/sum(conf71$table[1,])
+tree_UA71 <-  conf71$table[2,2]/sum(conf71$table[2,])
+water_UA71 <-  conf71$table[3,3]/sum(conf71$table[3,])
+shrub_UA71 <-  conf71$table[4,4]/sum(conf71$table[4,])
+
+
+
+
+labels <- c("Other", "Taiga", "Water", "Shrub",  "Other", "Taiga", "Water", "Shrub")
+data71 <- as.numeric(c(other_UA71, tree_UA71, 
+                     water_UA71, shrub_UA71, 
+                     other_PA71, tree_PA71, 
+                     water_PA71, shrub_PA71))
+type <- c("User Accuracy", "User Accuracy", 
+          "User Accuracy", "User Accuracy", 
+          "Producer Accuracy", "Producer Accuracy", 
+          "Producer Accuracy", "Producer Accuracy")
+acc71 <- tibble(labels, data71,type)
+acc71$percent <- round(acc71$data71*100,2)
+
+
+other_PA20 <- conf20$table[1,1]/sum(conf20$table[,1])
+tree_PA20 <-  conf20$table[2,2]/sum(conf20$table[,2])
+water_PA20 <-  conf20$table[3,3]/sum(conf20$table[,3])
+shrub_PA20 <-  conf20$table[4,4]/sum(conf20$table[,4])
+
+
+other_UA20 <- conf20$table[1,1]/sum(conf20$table[1,])
+tree_UA20 <-  conf20$table[2,2]/sum(conf20$table[2,])
+water_UA20 <-  conf20$table[3,3]/sum(conf20$table[3,])
+shrub_UA20 <-  conf20$table[4,4]/sum(conf20$table[4,])
+
+
+
+
+labels <- c("Other", "Taiga", "Water", "Shrub",  "Other", "Taiga", "Water", "Shrub")
+data20 <- as.numeric(c(other_UA20, tree_UA20, 
+                       water_UA20, shrub_UA20, 
+                       other_PA20, tree_PA20, 
+                       water_PA20, shrub_PA20))
+type <- c("User Accuracy", "User Accuracy", 
+          "User Accuracy", "User Accuracy", 
+          "Producer Accuracy", "Producer Accuracy", 
+          "Producer Accuracy", "Producer Accuracy")
+acc20 <- tibble(labels, data20,type)
+acc20$percent <- round(acc20$data20*100,2)
+
+acc20w <- acc20 %>% filter(labels == "Water")
+acc20t <- acc20 %>% filter(labels == "Taiga")
+acc20s <- acc20 %>% filter(labels == "Shrub")
+acc20o <- acc20 %>% filter(labels == "Other")
+acc71w <- acc71 %>% filter(labels == "Water")
+acc71t <- acc71 %>% filter(labels == "Taiga")
+acc71s <- acc71 %>% filter(labels == "Shrub")
+acc71o <- acc71 %>% filter(labels == "Other")
+
+
+accuracy <- data.frame('Accuracy type' = rep(c("Producer's Accuracy (%)",
+                                           "User's Accuracy (%)"),each=2),
+                       "Year" = c(1971,2020,1971,2020),
+                       "Water" = round(c(acc71w$percent[2],
+                                   acc20w$percent[2],
+                                   acc71w$percent[1],
+                                   acc20w$percent[1]),1),
+                       "Taiga" = round(c(acc71t$percent[2],
+                                   acc20t$percent[2],
+                                   acc71t$percent[1],
+                                   acc20t$percent[1]),1),
+                       "Shrub" = round(c(acc71s$percent[2],
+                                   acc20s$percent[2],
+                                   acc71s$percent[1],
+                                   acc20s$percent[1]),1),
+                       "Other" = round(c(acc71o$percent[2],
+                                   acc20o$percent[2],
+                                   acc71o$percent[1],
+                                   acc20o$percent[1]),1))
+
+
+
+
 ######### Exploratory data analysis -----
 # comparision to trends
 greenCompP <- project(greenComp, crs(class71m))
@@ -670,6 +757,52 @@ legend("topright", c("taiga", "shrub"),
 
 dev.off()
 
+
+########### Table 1: Accuracy -----
+
+gt_scientific <- function(table) {
+  table %>%
+    tab_options(row_group.as_column = TRUE,
+                data_row.padding = px(6),
+                heading.align = 'left',
+                heading.title.font.size = 12,
+                table.border.top.width = px(0),
+                table.border.bottom.color = 'black',
+                table_body.vlines.width = px(0),
+                table_body.hlines.width = px(0),
+                table_body.border.top.width = px(0),
+                table_body.border.bottom.width = px(0),
+                stub_row_group.border.width = px(0),
+                column_labels.font.size = 12,
+                heading.border.bottom.color = 'black',
+                column_labels.border.bottom.color = 'black',
+                table.font.size = 12) %>%
+    opt_table_font(font = 'Times New Roman') %>%
+    tab_style(style = list(
+      cell_borders(
+        sides = "bottom",
+        color = "black",
+        weight = px(2)
+      )),
+      locations = list(cells_stubhead(), cells_column_labels())
+    ) %>%
+    tab_style(style = list(
+      cell_borders(
+        sides = "top",
+        color = "transparent",
+        weight = px(0)
+      )),
+      locations = list(cells_body(), cells_row_groups())
+    )
+}
+
+
+accuracy_table <- accuracy %>% gt(groupname_col = 'Accuracy.type') %>%  
+  tab_header(title = md("**Table 1** Accuracy table for landcover classes in each year")) %>%
+  tab_stubhead(label = 'Accuracy type') %>%
+  gt_scientific() 
+
+gtsave(accuracy_table, 'accuracy_table.png',paste0(dirSave))
 
 
 ########### Figure Supplement: examples of changes -----
