@@ -5,6 +5,7 @@ library(caret)
 library(exactextractr)
 library(gt)
 
+
 ###### read in data ----
 dirData <- "G:/My Drive/research/projects/Kolyma/final"
 
@@ -30,6 +31,9 @@ plot(distW20w)
 greenComp <- rast("E:/Kolyma/BorealForest_Greenness_Trends_2023/BorealForest_Greenness_Trends_2023/data/boreal_greenness_median_percent_change_2000to2019_p500.tif")
 
 plot(greenComp)
+
+wb <- vect("G:/My Drive/GIS/natural_earth/ne_10m_admin_0_countries")
+plot(wb)
 ###### figure director ----
 dirSave <- "G:/My Drive/research/projects/Kolyma/manuscript/figures"
 ###### change maps and analysis ----
@@ -375,7 +379,11 @@ colsChange <- c("white", "#D15230", "#4393c3", "grey30")
 colsHydroChange <- c("white", "#4393c3","#D15230")
 
 
-
+############ Figure 1 : locator map -----
+ext <- c(-180,180,45,90)
+worldC <- crop(wb, ext)
+worldPolar <- project(worldC,"EPSG:3995")
+plot(worldPolar)
 ############ Figure 2: land cover maps and images -----
 
 
