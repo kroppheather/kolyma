@@ -382,8 +382,21 @@ colsHydroChange <- c("white", "#4393c3","#D15230")
 ############ Figure 1 : locator map -----
 ext <- c(-180,180,45,90)
 worldC <- crop(wb, ext)
-worldPolar <- project(worldC,"EPSG:3995")
+custP <- "PROJCRS[\"WGS 84 / Arctic Polar Stereographic\",\n    BASEGEOGCRS[\"WGS 84\",\n        DATUM[\"World Geodetic System 1984\",\n            ELLIPSOID[\"WGS 84\",6378137,298.257223563,\n                LENGTHUNIT[\"metre\",1]]],\n        PRIMEM[\"Greenwich\",168,\n            ANGLEUNIT[\"degree\",0.0174532925199433]],\n        ID[\"EPSG\",4326]],\n    CONVERSION[\"Arctic Polar Stereographic\",\n        METHOD[\"Polar Stereographic (variant B)\",\n            ID[\"EPSG\",9829]],\n        PARAMETER[\"Latitude of standard parallel\",71,\n            ANGLEUNIT[\"degree\",0.0174532925199433],\n            ID[\"EPSG\",8832]],\n        PARAMETER[\"Longitude of origin\",0,\n            ANGLEUNIT[\"degree\",0.0174532925199433],\n            ID[\"EPSG\",8833]],\n        PARAMETER[\"False easting\",0,\n            LENGTHUNIT[\"metre\",1],\n            ID[\"EPSG\",8806]],\n        PARAMETER[\"False northing\",0,\n            LENGTHUNIT[\"metre\",1],\n            ID[\"EPSG\",8807]]],\n    CS[Cartesian,2],\n        AXIS[\"easting (X)\",south,\n            MERIDIAN[90,\n                ANGLEUNIT[\"degree\",0.0174532925199433]],\n            ORDER[1],\n            LENGTHUNIT[\"metre\",1]],\n        AXIS[\"northing (Y)\",south,\n            MERIDIAN[180,\n                ANGLEUNIT[\"degree\",0.0174532925199433]],\n            ORDER[2],\n            LENGTHUNIT[\"metre\",1]],\n    USAGE[\n        SCOPE[\"Polar research.\"],\n        AREA[\"Northern hemisphere - north of 60°N onshore and offshore, including Arctic.\"],\n        BBOX[60,-180,90,180]],\n    ID[\"EPSG\",3995]]"
+
+worldPolar <- project(worldC,custP)
 plot(worldPolar)
+
+
+kolBoundP <- project(bound, custP)
+
+kolyPoint <- c(ext(kolBoundP)[1], ext(kolBoundP)[3])
+plot(worldPolar, xlim=c(-3000000,3000000), ylim=c(-3500000,2500000),
+      col="grey50", border=NA, 
+     background="#B3D6E655")
+
+points(kolBoundP, pch=19, cex=2, col="tomato3")
+
 ############ Figure 2: land cover maps and images -----
 
 
