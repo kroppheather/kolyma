@@ -273,7 +273,9 @@ shrubV71 <- subset(classV71, classV71$mean == 3)
 plot(shrubV71, col="green", border=NA)
 shrubV71s <- st_as_sf(shrubV71)
 plot(shrubV71s)
-
+waterV71 <- subset(classV71, classV71$mean == 2)
+waterV71s <- st_as_sf(waterV71)
+plot(waterV71s)
 
 covS71 <- exact_extract(greenCompC, shrubV71s, include_cell=TRUE)
 covS71d <- data.frame(covS71[[1]])
@@ -287,9 +289,25 @@ plot(perc71comp)
 values(perc71comp) <- covs71A$percCov
 plot(perc71comp)
 
+
+wcovS71 <- exact_extract(greenCompC, waterV71s, include_cell=TRUE)
+covW71d <- data.frame(wcovS71[[1]])
+wcomp71J <- values(greenCompC, mat=FALSE, dataframe=TRUE)
+wcomp71J$cell <- 1:nrow(wcomp71J)
+wcovs71A <- left_join(wcomp71J, covW71d, by="cell")
+wcovs71A$percCov <- ifelse(is.na(wcovs71A$coverage_fraction),0,
+                          wcovs71A$coverage_fraction*100)
+wperc71comp <- greenCompC
+plot(wperc71comp)
+values(wperc71comp) <- wcovs71A$percCov
+plot(wperc71comp)
+
 classV20 <- as.polygons(class20, aggregate=TRUE, na.rm=TRUE)
 shrubV20 <- subset(classV20, classV20$mean == 3)
 shrubV20s <- st_as_sf(shrubV20)
+waterV20 <- subset(classV20, classV20$mean == 2)
+waterV20s <- st_as_sf(waterV20)
+
 
 
 covS20 <- exact_extract(greenCompC, shrubV20s, include_cell=TRUE)
@@ -303,20 +321,53 @@ perc20comp <- greenCompC
 plot(perc20comp)
 values(perc20comp) <- covs20A$percCov
 plot(perc20comp)
+names(perc20comp) <- "perc20compS"
+
+covW20 <- exact_extract(greenCompC, waterV20s, include_cell=TRUE)
+covW20d <- data.frame(covW20[[1]])
+wcomp20J <- values(greenCompC, mat=FALSE, dataframe=TRUE)
+wcomp20J$cell <- 1:nrow(wcomp20J)
+wcovs20A <- left_join(wcomp20J, covW20d, by="cell")
+wcovs20A$percCov <- ifelse(is.na(wcovs20A$coverage_fraction),0,
+                         wcovs20A$coverage_fraction*100)
+wperc20comp <- greenCompC
+plot(wperc20comp)
+values(wperc20comp) <- wcovs20A$percCov
+plot(wperc20comp)
+
 
 changePercShrub <- perc20comp - perc71comp
 plot(changePercShrub)
+
+changePercWater <- wperc20comp - wperc71comp
+plot(changePercWater)
 plot(greenCompC)
 names(changePercShrub) <- "percShrubC"
-greenStack <- c(greenCompC, changePercShrub)
+names(changePercWater) <- "percWaterC"
+greenStack <- c(greenCompC, changePercShrub, changePercWater, perc20comp)
+
+
 
 greenCompDF <- values(greenStack, dataframe=TRUE)
-plot(greenCompDF$percShrubC, greenCompDF$boreal_greenness_median_percent_change_2000to2019_p500)
+plot(greenCompDF$percShrubC, 
+     greenCompDF$boreal_greenness_median_percent_change_2000to2019_p500)
+plot(greenCompDF$percWaterC, 
+     greenCompDF$boreal_greenness_median_percent_change_2000to2019_p500)
+plot(greenCompDF$perc20compS, 
+     greenCompDF$boreal_greenness_median_percent_change_2000to2019_p500)
+
+
+# apply mask
+greenCompCm <- mask(greenCompC, bound)
+changePercShrubm <- mask(changePercShrub, bound)
+changePercWaterm <- mask(changePercWater, bound)
+
+lcresChange <- resample(class20, greenCompCm, method="mode")
 
 par(mfrow=c(1,3))
-plot(greenCompC)
-plot(changePercShrub)
-plot(shrubChange, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsChange)
+plot(greenCompCm)
+plot(changePercShrubm)
+plot(changePercWaterm)
 
 
 ############ Figure variables -----
