@@ -362,13 +362,18 @@ greenCompCm <- mask(greenCompC, bound)
 changePercShrubm <- mask(changePercShrub, bound)
 changePercWaterm <- mask(changePercWater, bound)
 
-lcresChange <- resample(class20, greenCompCm, method="mode")
+
 
 par(mfrow=c(1,3))
-plot(greenCompCm)
-plot(changePercShrubm)
-plot(changePercWaterm)
+plot(greenCompCm,breaks=c(-1,1,2,3,4,5,6),
+     col=colPalT[4:11])
+plot(changePercShrubm,col=hcl.colors(16,"RdYlBu"),
+    breaks= seq(-60,100,by=10))
+plot(changePercWaterm,col=hcl.colors(16,"RdYlBu"),
+     breaks= seq(-85,75,by=10))
 
+colPalT <- hcl.colors(11,"RdYlBu")
+colPalT2 <- hcl.colors(8,"RdYlBu")
 
 ############ Figure variables -----
 colsClass <- c("#ECECDD", "#117835" , "#0336A3","#9CC20E")
