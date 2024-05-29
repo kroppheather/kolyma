@@ -603,10 +603,19 @@ img20WL <- crop(img20m, aoiWL)
 img71WG <- crop(img71m, aoiWG)
 img20WG <- crop(img20m, aoiWG)
 
+waterWG20 <- crop(waterV20, aoiWG)
+waterWG71 <- crop(waterV71, aoiWG)
+waterWL71 <- crop(waterV71, aoiWL)
+
+plot(waterWG20, col=NA, border="blue", add=TRUE )
+plot(waterWG71, col=NA, border="blue", add=TRUE )
 plot(img71WG, col=grey(1:100/100),axes=FALSE, mar=NA, legend=FALSE,
      maxcell=ncell(img71m))
+plot(waterWG71, col=NA, border="blue", add=TRUE )
 plotRGB(img20WG, r=3, g=2, b= 1, stretch="lin", axes=FALSE, mar=NA, legend=FALSE,
         maxcell=ncell(img20m))
+plot(waterWG71, col=NA, border="blue", add=TRUE, lwd=2 )
+plot(waterWL71, col=NA, border="blue", lwd=2 )
 
 # plot dim
 wd <- 4
@@ -692,6 +701,7 @@ par(mai=c(0.01,0.01,0.01,0.01))
 
 plotRGB(img20WL, r=3, g=2, b= 1, stretch="lin", axes=FALSE, mar=NA, legend=FALSE,
         maxcell=ncell(img20m))
+plot(waterWL71, col=NA, border="blue", add=TRUE, lwd=3 )
 mtext("c", side=3, at=594830,  line=llc, cex=pcx, col="white")
 par(mai=c(0.01,0.01,0.01,0.01))
 
@@ -710,6 +720,7 @@ par(mai=c(0.01,0.01,0.01,0.01))
 
 plotRGB(img20WG, r=3, g=2, b= 1, stretch="lin", axes=FALSE, mar=NA, legend=FALSE,
         maxcell=ncell(img20m))
+plot(waterWG71, col=NA, border="blue", add=TRUE, lwd=3 )
 mtext("e", side=3, at=591050,  line=llc, cex=pcx, col="white")
 dev.off()
 
