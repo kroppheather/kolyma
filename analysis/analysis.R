@@ -362,18 +362,18 @@ greenCompCm <- mask(greenCompC, bound)
 changePercShrubm <- mask(changePercShrub, bound)
 changePercWaterm <- mask(changePercWater, bound)
 
-
+colPalT <- hcl.colors(11,"RdYlBu")
+colPalT2 <- hcl.colors(8,"RdYlBu")
 
 par(mfrow=c(1,3))
 plot(greenCompCm,breaks=c(-1,1,2,3,4,5,6),
      col=colPalT[4:11])
-plot(changePercShrubm,col=hcl.colors(16,"RdYlBu"),
-    breaks= seq(-60,100,by=10))
-plot(changePercWaterm,col=hcl.colors(16,"RdYlBu"),
-     breaks= seq(-85,75,by=10))
+plot(changePercShrubm,col=hcl.colors(13,"RdYlBu")[2:13],
+    breaks= c(-80,-60,-40,-20,-5,5,20,40,60,80,100))
+plot(changePercWaterm,col=hcl.colors(13,"RdYlBu")[2:13],
+     breaks= c(-80,-60,-40,-20,-5,5,20,40,60,80,100))
 
-colPalT <- hcl.colors(11,"RdYlBu")
-colPalT2 <- hcl.colors(8,"RdYlBu")
+plot(seq(1,13),seq(1,13), col=hcl.colors(13,"RdYlBu"), pch=19)
 
 ############ Figure variables -----
 colsClass <- c("#ECECDD", "#117835" , "#0336A3","#9CC20E")
@@ -828,7 +828,7 @@ accuracy_table <- accuracy %>% gt(groupname_col = 'Accuracy.type') %>%
 gtsave(accuracy_table, 'accuracy_table.png',paste0(dirSave))
 
 
-########### Figure Supplement: examples of changes -----
+########### Figure : examples of changes -----
 # taiga loss
 aoiTL <- aoi[1,]
 # shrub gain
@@ -1004,4 +1004,92 @@ plot(lc20SG, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsClass,
      legend=FALSE,  axes=FALSE, mar=NA, maxcell=ncell(lc20SG))
 mtext("p", side=3, at=593800,  line=llc, cex=pcx, col=pcc)
 dev.off()
+
+
+############# Figure greening and change -------
+wd <- 4
+wd2 <- 2
+hd <- 6
+
+gCbreaks <- c(-1,0,1,2,3,4,5,6)
+gcCols <- hcl.colors(11,"RdYlBu")[5:11]
+lcbreaks <- c(-80,-60,-40,-20,-5,5,20,40,60,80,100)
+lcCols <- hcl.colors(13,"RdYlBu")[3:13]
+
+# size of legend labels
+clt <- 2
+
+#panel label line
+llc <- -1
+#panel label size
+pcx <- 2
+
+plot(seq(1,11), seq(1,11), pch=19, col=hcl.colors(11,"RdYlBu"))
+
+png(paste0(dirSave, "/fig_trend_comp.png"), width=20, height=10, units="in", res=300)
+layout(matrix(seq(1,6),ncol=6, byrow=TRUE), 
+       width=lcm(c(wd,wd2,wd,wd2,wd,wd2)*2.54),height=lcm(hd*2.54))
+
+par(mai=c(0,0,0,0))
+
+plot(greenCompCm,breaks=gCbreaks,
+     col=gcCols, axes=FALSE, mar=NA, legend=FALSE)
+#box(which="plot")
+mtext("a", side=3, at=589000,  line=llc, cex=pcx)
+
+par(mai=c(0,0,0,0))
+
+plot( c(0,10),c(-1.5,6.5), type="n", axes=FALSE, xlab=" ", ylab= " ")
+
+for(i in 2:length(gCbreaks)){
+  polygon(c(1,1,3,3), c(gCbreaks[i-1],gCbreaks[i],gCbreaks[i],gCbreaks[i-1]),
+          col=gcCols[i-1])
+  
+}
+arrows(rep(3, length(gCbreaks)),gCbreaks,
+       rep(4, length(gCbreaks)),gCbreaks, code=0)
+text(rep(5, length(gCbreaks)), gCbreaks,  paste(gCbreaks), cex=clt)
+
+par(mai=c(0,0,0,0))
+
+
+plot(changePercShrubm,col=lcCols,
+     breaks= lcbreaks, axes=FALSE, mar=NA, legend=FALSE)
+#box(which="plot")
+mtext("b", side=3, at=589000,  line=llc, cex=pcx)
+par(mai=c(0,0,0,0))
+
+plot( c(0,10),c(-81,101), type="n", axes=FALSE, xlab=" ", ylab= " ")
+
+for(i in 2:length(lcbreaks)){
+  polygon(c(1,1,3,3), c(lcbreaks[i-1],lcbreaks[i],lcbreaks[i],lcbreaks[i-1]),
+          col=lcCols[i-1])
+  
+}
+arrows(rep(3, length(lcbreaks)),lcbreaks,
+       rep(4, length(lcbreaks)),lcbreaks, code=0)
+text(rep(5, length(lcbreaks)),lcbreaks,  paste(lcbreaks), cex=clt)
+
+par(mai=c(0,0,0,0))
+plot(changePercWaterm,col=lcCols,
+     breaks= lcbreaks, axes=FALSE, mar=NA, legend=FALSE)
+mtext("c", side=3, at=589000,  line=llc, cex=pcx)
+#box(which="plot")
+par(mai=c(0,0,0,0))
+
+plot( c(0,10),c(-81,101), type="n", axes=FALSE, xlab=" ", ylab= " ")
+
+
+for(i in 2:length(lcbreaks)){
+  polygon(c(1,1,3,3), c(lcbreaks[i-1],lcbreaks[i],lcbreaks[i],lcbreaks[i-1]),
+          col=lcCols[i-1])
+  
+}
+arrows(rep(3, length(lcbreaks)),lcbreaks,
+       rep(4, length(lcbreaks)),lcbreaks, code=0)
+text(rep(5, length(lcbreaks)),lcbreaks,  paste(lcbreaks), cex=clt)
+
+
+dev.off()
+
 
