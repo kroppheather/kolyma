@@ -13,6 +13,7 @@ class71 <- rast(paste0(dirData, "/class1971_6.tif"))
 class20 <- rast(paste0(dirData, "/class2020_strat_v2.tif"))
 bound <- vect(paste0(dirData,"/bound/na_bound_71e.shp"))
 
+
 valid71 <- st_read(paste0(dirData,"/valid/valid_class1971_6.shp"))
 valid20 <- st_read(paste0(dirData,"/valid/valid_class2020_strat_2.shp"))
 
@@ -257,7 +258,25 @@ accuracy <- data.frame('Accuracy type' = rep(c("Producer's Accuracy (%)",
                                    acc20o$percent[1]),1))
 
 
+other_PA71 <- conf71$table[1,1]/sum(conf71$table[,1])
+tree_PA71 <-  conf71$table[2,2]/sum(conf71$table[,2])
+water_PA71 <-  conf71$table[3,3]/sum(conf71$table[,3])
+shrub_PA71 <-  conf71$table[4,4]/sum(conf71$table[,4])
+#order of accuracy is Water, taiga, shrub, other
+sampRef71 <- c(sum(conf71$table[,3]),
+             sum(conf71$table[,2]),
+             sum(conf71$table[,4]),
+             sum(conf71$table[,1]))
 
+sampRef20 <- c(sum(conf20$table[,3]),
+               sum(conf20$table[,2]),
+               sum(conf20$table[,4]),
+               sum(conf20$table[,1]))
+
+
+ar_km2 <- expanse(bound, unit="km")
+SE71 <- sqrt(sum(((ar_km2^2)*((accuracy[1,3:6]/100)-((accuracy[1,3:6]/100)^2)))/(sampRef71-1)))
+SE20 <- sqrt(sum(((ar_km2^2)*((accuracy[2,3:6]/100)-((accuracy[2,3:6]/100)^2)))/(sampRef20-1)))
 
 ######### Exploratory data analysis -----
 # comparision to trends
@@ -837,6 +856,10 @@ accuracy_table <- accuracy %>% gt(groupname_col = 'Accuracy.type') %>%
   gt_scientific() 
 
 gtsave(accuracy_table, 'accuracy_table.png',paste0(dirSave))
+
+write.csv(accuracy, paste0(dirSave, "/accuracy.csv"))
+
+
 
 
 ########### Figure : examples of changes -----
