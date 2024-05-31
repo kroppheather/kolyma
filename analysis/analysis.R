@@ -43,16 +43,21 @@ dirSave <- "G:/My Drive/research/projects/Kolyma/manuscript/figures"
 plot(class71)
 plot(class20)
 
-# calculate frequency & percent occurance
-freq71 <- freq(class71)
-freq20 <- freq(class20)
 
-freq71$perc <- (freq71$count/sum(freq71$count))*100
-freq20$perc <- (freq20$count/sum(freq20$count))*100
 # set the same boundary for both
 
 class71m <- mask(class71, bound)
 class20m <- mask(class20, bound)
+
+# calculate frequency & percent occurance
+freq71 <- freq(class71m)
+freq20 <- freq(class20m)
+
+freq71$perc <- (freq71$count/sum(freq71$count))*100
+freq20$perc <- (freq20$count/sum(freq20$count))*100
+# calc
+freq71$area_km <- freq71$count*res(class71)[1]*res(class71)[2]*0.000001
+freq20$area_km <- freq20$count*res(class20)[1]*res(class20)[2]*0.000001
 
 img71m <- mask(img71, bound)
 img20m <- mask(img20, bound)
@@ -422,9 +427,9 @@ points(kolBoundP, pch=19, cex=2, col="tomato3")
 
 
 # plot dim
-wd <- 4
-hd1 <- 5
-hd2 <- 2
+wd <- 4.5
+hd1 <- 5.5
+hd2 <- 2.5
 # arrow line width for scale bar
 awd <- 2
 # text size for scale bar
@@ -436,16 +441,16 @@ lax <- 2
 #border for bars
 borderi <- c("black",NA,NA,NA)
 #size for area text label
-tcx <- 1.2
+tcx <- 1.6
 #panel label line
-llc <- -1.75
+llc <- -1
 #panel label size
 pcx <- 2
 # x type label
 capl <- 1.5
 
 
-png(paste0(dirSave, "/fig_2_cover_panel.png"), width=14, height=14, units="in", res=300)
+png(paste0(dirSave, "/fig_2_cover_panel_area.png"), width=14, height=14, units="in", res=300)
 layout(matrix(seq(1,6),ncol=2), width=lcm(rep(wd*2.54,3)),height=lcm(c(hd1,hd1,hd2)*2.54))
 # 1971 imagery
 par(mai=c(0.01,0.01,0.01,0.01))
@@ -471,26 +476,30 @@ mtext("c", side=3, at=589000,  line=llc, cex=pcx)
 
 par(mai=c(0.1,0.1,0.1,0.1))
 
-plot(c(0,1),c(0,1), xlim=c(0.5,4.5),ylim=c(0,60),
+plot(c(0,1),c(0,1), xlim=c(0.5,4.5),ylim=c(0,101),
      xlab= " ", ylab = " ", xaxs="i", yaxs="i",axes=FALSE,
      type="n")
 for(i in 1:4){
   polygon(c(i-0.25,i-0.25,i+0.25,i+0.25),
-          c(0,freq71$perc[i],freq71$perc[i],0),
+          c(0,freq71$area_km[i],freq71$area_km[i],0),
           col=colsClass[i], border=borderi[i])
   
 }
+
+arrows(seq(1,4), freq71$area_km- SE71, seq(1,4), freq71$area_km + SE71, code=0,
+       lwd=2)
+text(seq(1,4), freq71$area_km+7, paste0(round(freq71$area_km,0)), cex=1.5)
 mtext("e", side=3, at=0.8,  line=llc, cex=pcx)
 
 axis(1, seq(1,4),labels=c("","","",""), 
      cex.axis=cap, lwd.ticks=1.5, lwd=2)
-axis(2, seq(0,60, by=20), las=2, cex.axis= cap , lwd.ticks=1.5, lwd=2)
+axis(2, seq(0,100, by=20), las=2, cex.axis= cap , lwd.ticks=1.5, lwd=2)
 mtext("Land cover type", side=1, line=5, cex=lax )
-mtext("Percent Area (%)", side=2, line=4, cex=lax )
+mtext(expression(paste("Area (km"^2,")")), side=2, line=4, cex=lax )
 
 mtext(c("Other","Taiga","Water","Shrub"), at=seq(1,4),side=1.5, cex=capl,
       line=1)
-text(seq(1,4), freq71$perc+5, paste0(round(freq71$perc,1)), cex=1.5)
+
 
 # 2020 image
 par(mai=c(0.01,0.01,0.01,0.01))
@@ -508,22 +517,24 @@ mtext("d", side=3, at=589000,  line=llc, cex=pcx)
 
 par(mai=c(0.1,0.1,0.1,0.1))
 
-plot(c(0,1),c(0,1), xlim=c(0.5,4.5),ylim=c(0,60),
+plot(c(0,1),c(0,1), xlim=c(0.5,4.5),ylim=c(0,101),
      xlab= " ", ylab = " ", xaxs="i", yaxs="i",axes=FALSE,
      type="n")
 for(i in 1:4){
   polygon(c(i-0.25,i-0.25,i+0.25,i+0.25),
-          c(0,freq20$perc[i],freq20$perc[i],0),
+          c(0,freq20$area_km[i],freq20$area_km[i],0),
           col=colsClass[i], border=borderi[i])
   
 }
 mtext("f", side=3, at=0.8,  line=llc, cex=pcx)
 
-text(seq(1,4), freq20$perc+5, paste0(round(freq20$perc,1)), cex=1.5)
+text(seq(1,4), freq20$area_km+7, paste0(round(freq20$area_km,0)), cex=1.5)
+arrows(seq(1,4), freq20$area_km- SE20, seq(1,4), freq20$area_km + SE20, code=0,
+       lwd=2)
 
 axis(1, seq(1,4),labels=c("","","",""), 
      cex.axis=cap, lwd.ticks=1.5, lwd=2)
-axis(2, seq(0,60, by=20), las=2, cex.axis= cap , lwd.ticks=1.5, lwd=2)
+axis(2, seq(0,100, by=20), las=2, cex.axis= cap , lwd.ticks=1.5, lwd=2)
 mtext("Land cover type", side=1, line=5, cex=lax )
 mtext(c("Other","Taiga","Water","Shrub"), at=seq(1,4),side=1.5, cex=capl,
       line=1)
@@ -592,18 +603,20 @@ mtext("Taiga", side=3,   line=llcm, cex=mcx)
 par(mai=c(0.01,0.01,0.01,0.01))
 plot(c(0,10),c(0,10), type="n", axes=FALSE, xlab=" ", ylab= " ")
 
-legend("center", c("no cover", "loss", "gain","stable"),
-       fill=colsChange, bty="n", horiz=TRUE, cex=1.4)
+legend("center", c("no cover"),
+       fill=colsChange[1], bty="n", horiz=TRUE, cex=2.5)
 
 par(mai=c(0.01,0.01,0.01,0.01))
 plot(c(0,10),c(0,10), type="n", axes=FALSE, xlab=" ", ylab= " ")
-legend("center", c("no cover", "loss", "gain","stable"),
-       fill=colsChange, bty="n", horiz=TRUE, cex=1.4)
+legend("right", c( "loss"),
+       fill=colsChange[2], bty="n", horiz=TRUE, cex=2.5)
+legend("left", c( "gain"),
+       fill=colsChange[3], bty="n", horiz=TRUE, cex=2.5)
 
 par(mai=c(0.01,0.01,0.01,0.01))
 plot(c(0,10),c(0,10), type="n", axes=FALSE, xlab=" ", ylab= " ")
-legend("center", c("no cover", "loss", "gain","stable"),
-       fill=colsChange, bty="n", horiz=TRUE, cex=1.4)
+legend("center", c("stable"),
+       fill=colsChange[4], bty="n", horiz=TRUE, cex=2.5)
 
 dev.off()
 
@@ -916,9 +929,9 @@ scb <- "white"
 pcc <- "white"
 
 
-png(paste0(dirSave, "/fig_supplement_change examples.png"), width=20, height=20, units="in", res=300)
-layout(matrix(seq(1,16),ncol=4, byrow=TRUE), 
-       width=lcm(rep(wd*2.54,4)),height=lcm(c(hd1,hd1, hd1,hd1)*2.54))
+png(paste0(dirSave, "/fig_change examples.png"), width=25, height=20, units="in", res=300)
+layout(matrix(seq(1,20),ncol=5, byrow=TRUE), 
+       width=lcm(rep(wd*2.54,5)),height=lcm(c(hd1,hd1, hd1,hd1)*2.54))
 
 ### Taiga loss
 # 1971 imagery
@@ -948,6 +961,11 @@ par(mai=c(0.01,0.01,0.01,0.01))
 plot(lc20TL, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsClass,
      legend=FALSE,  axes=FALSE, mar=NA, maxcell=ncell(lc20TL))
 mtext("d", side=3, at=597660,  line=llc, cex=pcx, col=pcc)
+
+par(mai=c(0.01,0.01,0.01,0.01))
+plot(c(0,10), c(0,10), type="n",xlab= " ", ylab=" ", axes=FALSE)
+legend("topleft", c("other", "taiga","water","shrub"),
+       fill=colsClass, bty="n", cex=5)
 ### taiga gain
 # 1971 imagery
 par(mai=c(0.01,0.01,0.01,0.01))
@@ -977,6 +995,8 @@ plot(lc20TG, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsClass,
      legend=FALSE,  axes=FALSE, mar=NA, maxcell=ncell(lc20TG))
 
 mtext("h", side=3, at=592200,  line=llc, cex=pcx, col=pcc)
+par(mai=c(0.01,0.01,0.01,0.01))
+plot(c(0,10), c(0,10), type="n",xlab= " ", ylab=" ", axes=FALSE)
 
 ### shrub loss
 # 1971 imagery
@@ -1008,6 +1028,8 @@ plot(lc20SL, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsClass,
      legend=FALSE,  axes=FALSE, mar=NA, maxcell=ncell(lc20SL))
 
 mtext("l", side=3, at=593660,  line=llc, cex=pcx, col=pcc)
+par(mai=c(0.01,0.01,0.01,0.01))
+plot(c(0,10), c(0,10), type="n",xlab= " ", ylab=" ", axes=FALSE)
 ### shrub gain
 # 1971 imagery
 par(mai=c(0.01,0.01,0.01,0.01))
@@ -1037,6 +1059,9 @@ par(mai=c(0.01,0.01,0.01,0.01))
 plot(lc20SG, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsClass,
      legend=FALSE,  axes=FALSE, mar=NA, maxcell=ncell(lc20SG))
 mtext("p", side=3, at=593800,  line=llc, cex=pcx, col=pcc)
+
+par(mai=c(0.01,0.01,0.01,0.01))
+plot(c(0,10), c(0,10), type="n",xlab= " ", ylab=" ", axes=FALSE)
 dev.off()
 
 
