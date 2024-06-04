@@ -132,7 +132,9 @@ shrubHydro <- lapp(hydroc, hydroChange)
 # 2 = loss of woody cover to gain of water
 # 3 = loss of water but no woody change
 plot(shrubHydro)
-
+countH <- freq(shrubHydro)
+areaHPerc <- (countH$count[2]+countH$count[3])*res(shrubHydro)[1]*res(shrubHydro)[2]
+areaHPerc_km <- areaHPerc*1e-6
 water20N <- ifel(water20 == 0, NA, 1)
 water71N <- ifel(water71 == 0, NA, 1)
 #writeRaster(water20N, "E:/Kolyma/distance/water20N.tif")
