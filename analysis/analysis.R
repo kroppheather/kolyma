@@ -135,6 +135,10 @@ plot(shrubHydro)
 countH <- freq(shrubHydro)
 areaHPerc <- (countH$count[2]+countH$count[3])*res(shrubHydro)[1]*res(shrubHydro)[2]
 areaHPerc_km <- areaHPerc*1e-6
+# area loss
+areaLPerc_km <- (countH$count[2]*res(shrubHydro)[1]*res(shrubHydro)[2])*1e-6
+areaGPerc_km <- (countH$count[3]*res(shrubHydro)[1]*res(shrubHydro)[2])*1e-6
+areaGPerc_km
 water20N <- ifel(water20 == 0, NA, 1)
 water71N <- ifel(water71 == 0, NA, 1)
 #writeRaster(water20N, "E:/Kolyma/distance/water20N.tif")
@@ -1075,7 +1079,7 @@ hd <- 6
 gCbreaks <- c(-1,0,1,2,3,4,5,6)
 gcCols <- hcl.colors(11,"RdYlBu")[5:11]
 lcbreaks <- c(-80,-60,-40,-20,-5,5,20,40,60,80,100)
-lcCols <- hcl.colors(13,"RdYlBu")[3:13]
+lcCols <- hcl.colors(11,"RdYlBu")[2:11]
 
 # size of legend labels
 clt <- 2
