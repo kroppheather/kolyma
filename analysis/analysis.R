@@ -23,6 +23,7 @@ img71 <- rast("E:/Kolyma/1971/ext_07_16_71.tif")
 img20 <- rast("E:/Kolyma/wv/wv8b_07_20.tif")
 
 aoi <- vect("E:/Kolyma/aoi/aoi.shp")
+aoiS <- vect("E:/Kolyma/aoi/AOI_supplement.shp")
 
 # Distance calculation from ArcGIS (after terra update broke the function)
 distW20w <- rast("E:/Kolyma/distance/dist_20N.tif")
@@ -1158,3 +1159,158 @@ text(rep(5, length(lcbreaks)),lcbreaks,  paste(lcbreaks), cex=clt)
 dev.off()
 
 
+
+
+
+########### Supplement Figure : examples of changes -----
+# taiga loss and possible flooding
+aoiSTL <- aoiS[1,]
+# taiga transition to shrub
+aoiSTC <- aoiS[3,]
+# fire prediction example
+aoiSF <- aoiS[2,]
+
+
+
+
+img71TL <- crop(img71m, aoiSTL)
+img20TL <- crop(img20m, aoiSTL)
+lc71TL <- crop(class71m, aoiSTL)
+lc20TL <- crop(class20m, aoiSTL)
+
+img71SG <- crop(img71m, aoiSF)
+img20SG <- crop(img20m, aoiSF)
+lc71SG <- crop(class71m, aoiSF)
+lc20SG <- crop(class20m, aoiSF)
+
+
+img71TG <- crop(img71m, aoiSTC)
+img20TG <- crop(img20m, aoiSTC)
+lc71TG <- crop(class71m, aoiSTC)
+lc20TG <- crop(class20m, aoiSTC)
+
+
+
+# plot dim
+wd <- 4
+hd1 <- 4
+# arrow line width for scale bar
+awd <- 2
+# text size for scale bar
+sce <- 3
+
+#panel label line
+llc <- -3.5
+llc2 <- -5
+#panel label size
+pcx <- 3
+# x type label
+capl <- 1.5
+# scale bar color
+scb <- "white"
+# panel label color
+pcc <- "white"
+
+
+png(paste0(dirSave, "/supplement fig_change examples.png"), width=25, height=20, units="in", res=300)
+layout(matrix(seq(1,15),ncol=5, byrow=TRUE), 
+       width=lcm(rep(wd*2.54,5)),height=lcm(c(hd1,hd1, hd1,hd1)*2.54))
+
+### Taiga loss to flooding
+# 1971 imagery
+par(mai=c(0.01,0.01,0.01,0.01))
+
+plot(img71TL, col=grey(1:100/100),axes=FALSE, mar=NA, legend=FALSE,
+     maxcell=ncell(img71TL))
+mtext("a", side=3, at=596920,  line=llc, cex=pcx, col=pcc)
+arrows(596920,7621590, 596990, 7621590, code=0, lwd=awd, col=scb)
+arrows(596920,7621570, 596920,7621590, code=0, lwd=awd, col=scb)
+arrows(596990,7621570, 596990, 7621590, code=0, lwd=awd, col=scb)
+text(596920,7621555, "0", cex=sce, col=scb)
+text(596945,7621555, "m", cex=sce, col=scb)
+text(596990,7621555, "70", cex=sce, col=scb)
+
+# 1971 class
+plot(lc71TL, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsClass,
+     legend=FALSE,  axes=FALSE, mar=NA, maxcell=ncell(lc71TL))
+mtext("b", side=3, at=596920,  line=llc, cex=pcx, col=pcc)
+# 2020 imagery
+par(mai=c(0.01,0.01,0.01,0.01))
+plotRGB(img20TL, r=3, g=2, b= 1, stretch="lin", axes=FALSE, mar=NA, legend=FALSE,
+        maxcell=ncell(img20TL))
+mtext("c", side=3, at=596920,  line=llc, cex=pcx, col=pcc)
+# 2020 class
+par(mai=c(0.01,0.01,0.01,0.01))
+plot(lc20TL, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsClass,
+     legend=FALSE,  axes=FALSE, mar=NA, maxcell=ncell(lc20TL))
+mtext("d", side=3, at=596920,  line=llc, cex=pcx, col=pcc)
+
+par(mai=c(0.01,0.01,0.01,0.01))
+plot(c(0,10), c(0,10), type="n",xlab= " ", ylab=" ", axes=FALSE)
+legend("topleft", c("other", "taiga","water","shrub"),
+       fill=colsClass, bty="n", cex=5)
+### taiga change to shrub
+# 1971 imagery
+par(mai=c(0.01,0.01,0.01,0.01))
+
+plot(img71TG, col=grey(1:100/100),axes=FALSE, mar=NA, legend=FALSE,
+     maxcell=ncell(img71TG))
+mtext("e", side=3, at=593630,  line=llc, cex=pcx, col=pcc)
+
+arrows(593630,7624650, 593670, 7624650, code=0, lwd=awd, col=scb)
+arrows(593630,7624640, 593630, 7624650, code=0, lwd=awd, col=scb)
+arrows(593670,7624640, 593670, 7624650, code=0, lwd=awd, col=scb)
+text(593630,7624630, "0", cex=sce, col=scb)
+text(593645,7624630, "m", cex=sce, col=scb)
+text(593670,7624630, "40", cex=sce, col=scb)
+# 1971 class
+plot(lc71TG, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsClass,
+     legend=FALSE,  axes=FALSE, mar=NA, maxcell=ncell(lc71TG))
+mtext("f", side=3, at=593630,  line=llc, cex=pcx, col=pcc)
+# 2020 imagery
+par(mai=c(0.01,0.01,0.01,0.01))
+plotRGB(img20TG, r=3, g=2, b= 1, stretch="lin", axes=FALSE, mar=NA, legend=FALSE,
+        maxcell=ncell(img20TG))
+mtext("g", side=3, at=593630,  line=llc, cex=pcx, col=pcc)
+# 2020 class
+par(mai=c(0.01,0.01,0.01,0.01))
+plot(lc20TG, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsClass,
+     legend=FALSE,  axes=FALSE, mar=NA, maxcell=ncell(lc20TG))
+
+mtext("h", side=3, at=593630,  line=llc, cex=pcx, col=pcc)
+par(mai=c(0.01,0.01,0.01,0.01))
+plot(c(0,10), c(0,10), type="n",xlab= " ", ylab=" ", axes=FALSE)
+
+### fire shrub prediction issues
+# 1971 imagery
+par(mai=c(0.01,0.01,0.01,0.01))
+
+plot(img71SG, col=grey(1:100/100),axes=FALSE, mar=NA, legend=FALSE,
+     maxcell=ncell(img71SG))
+mtext("m", side=3, at=598100,  line=llc2, cex=pcx, col=pcc)
+
+arrows(598080,7619650, 598150, 7619650, code=0, lwd=awd, col=scb)
+arrows(598080,7619630, 598080, 7619650, code=0, lwd=awd, col=scb)
+arrows(598150,7619630, 598150, 7619650, code=0, lwd=awd, col=scb)
+text(598080,7619618, "0", cex=sce, col=scb)
+text(598105,7619618, "m", cex=sce, col=scb)
+text(598150,7619618, "70", cex=sce, col=scb)
+
+# 1971 class
+plot(lc71SG, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsClass,
+     legend=FALSE,  axes=FALSE, mar=NA, maxcell=ncell(lc71SG))
+mtext("n", side=3, at=598100,  line=llc2, cex=pcx, col=pcc)
+# 2020 imagery
+par(mai=c(0.01,0.01,0.01,0.01))
+plotRGB(img20SG, r=3, g=2, b= 1, stretch="lin", axes=FALSE, mar=NA, legend=FALSE,
+        maxcell=ncell(img20SG))
+mtext("o", side=3, at=598100,  line=llc2, cex=pcx, col=pcc)
+# 2020 class
+par(mai=c(0.01,0.01,0.01,0.01))
+plot(lc20SG, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsClass,
+     legend=FALSE,  axes=FALSE, mar=NA, maxcell=ncell(lc20SG))
+mtext("p", side=3, at=598100,  line=llc2, cex=pcx, col=pcc)
+
+par(mai=c(0.01,0.01,0.01,0.01))
+plot(c(0,10), c(0,10), type="n",xlab= " ", ylab=" ", axes=FALSE)
+dev.off()
