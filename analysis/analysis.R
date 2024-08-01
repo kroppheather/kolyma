@@ -1287,7 +1287,7 @@ par(mai=c(0.01,0.01,0.01,0.01))
 
 plot(img71SG, col=grey(1:100/100),axes=FALSE, mar=NA, legend=FALSE,
      maxcell=ncell(img71SG))
-mtext("m", side=3, at=598100,  line=llc2, cex=pcx, col=pcc)
+mtext("h", side=3, at=598100,  line=llc2, cex=pcx, col=pcc)
 
 arrows(598080,7619650, 598150, 7619650, code=0, lwd=awd, col=scb)
 arrows(598080,7619630, 598080, 7619650, code=0, lwd=awd, col=scb)
@@ -1299,17 +1299,17 @@ text(598150,7619618, "70", cex=sce, col=scb)
 # 1971 class
 plot(lc71SG, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsClass,
      legend=FALSE,  axes=FALSE, mar=NA, maxcell=ncell(lc71SG))
-mtext("n", side=3, at=598100,  line=llc2, cex=pcx, col=pcc)
+mtext("i", side=3, at=598100,  line=llc2, cex=pcx, col=pcc)
 # 2020 imagery
 par(mai=c(0.01,0.01,0.01,0.01))
 plotRGB(img20SG, r=3, g=2, b= 1, stretch="lin", axes=FALSE, mar=NA, legend=FALSE,
         maxcell=ncell(img20SG))
-mtext("o", side=3, at=598100,  line=llc2, cex=pcx, col=pcc)
+mtext("j", side=3, at=598100,  line=llc2, cex=pcx, col=pcc)
 # 2020 class
 par(mai=c(0.01,0.01,0.01,0.01))
 plot(lc20SG, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsClass,
      legend=FALSE,  axes=FALSE, mar=NA, maxcell=ncell(lc20SG))
-mtext("p", side=3, at=598100,  line=llc2, cex=pcx, col=pcc)
+mtext("k", side=3, at=598100,  line=llc2, cex=pcx, col=pcc)
 
 par(mai=c(0.01,0.01,0.01,0.01))
 plot(c(0,10), c(0,10), type="n",xlab= " ", ylab=" ", axes=FALSE)
