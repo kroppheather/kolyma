@@ -1314,3 +1314,85 @@ mtext("k", side=3, at=598100,  line=llc2, cex=pcx, col=pcc)
 par(mai=c(0.01,0.01,0.01,0.01))
 plot(c(0,10), c(0,10), type="n",xlab= " ", ylab=" ", axes=FALSE)
 dev.off()
+
+
+otherStable <- function(x,y,z){
+  ifelse(x ==0 & y== 0 & z==0,1,0)
+}
+
+otherStack <- c(shrubChange, taigaChange, waterChange)
+otherC <- lapp(otherStack, fun=otherStable)
+plot(otherC)
+
+
+# look at change in cover
+changeShrubType <- function(x){
+  ifelse(x == 3, 2, #stable
+                 ifelse(x == 2, 3,0)) # gain
+}
+shrubType <- app(shrubChange, fun=changeShrubType)
+plot(shrubType)
+changeTaigaType <- function(x){
+  ifelse(x == 3, 4, #stable
+                 ifelse(x == 2, 5,0)) # gain
+}
+taigaType <- app(taigaChange, fun=changeTaigaType)
+plot(taigaType)
+plot(otherC)
+
+
+changeClassAll <- taigaType + shrubType  + otherC
+freq(changeClassAll)
+plot(changeClassAll)
+
+customMode <- function(x){
+  uniq_v <- unique(x)
+  output <- uniq_v[which.max(tabulate(match(x, uniq_v)))]
+  sum(x == output)/length(x)
+}
+
+changeClassAgg <- aggregate(changeClassAll,
+                            fact=60,
+                            fun=customMode)
+changeClassAgg
+plot(changeClassAgg)
+
+changeClassAgg2 <- aggregate(changeClassAll,
+                            fact=60,
+                            fun="modal")
+plot(changeClassAgg2)
+
+
+classThresh <- function(x,y){
+  ifelse(x > 0.5,y,0)
+}
+changeClassA <- c(changeClassAgg, changeClassAgg2) 
+
+changeClassMaj <- lapp(changeClassA, classThresh)
+plot(changeClassMaj)
+freq(changeClassMaj)
+
+
+# get landsat grid
+
+
+landG <- rast("E:/Kolyma/landsat/LC08_L2SP_104012_20140814_20200911_02_T1_SR_B2.tif")
+landGp <- project(landG, crs(changeClassMaj))
+landGc <- crop(landGp, changeClassMaj)
+plot(landGc)
+changeClassLc <- resample(changeClassMaj, landGc, method="near")
+plot(changeClassLc)
+tableLC <- freq(changeClassLc)
+tableLC$Names <- c("NA",
+                   "Other stable",
+                   "Shrub stable",
+                   "Shrub gain",
+                   "Taiga stable",
+                   "Taiga gain")
+
+write.csv(tableLC, "E:/Kolyma/LC_class/class_id.csv", row.names=FALSE)
+writeRaster(changeClassLc,"E:/Kolyma/LC_class/landclass_LC.tif")
+
+
+landcheck <- rast("E:/Kolyma/LC_class/landclass_LC.tif")
+plot(landcheck)
