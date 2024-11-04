@@ -1377,6 +1377,9 @@ freq(changeClassMaj)
 
 
 landG <- rast("E:/Kolyma/landsat/LC08_L2SP_104012_20140814_20200911_02_T1_SR_B2.tif")
+plot(landG)
+plot(landGp)
+plot(changeClassLc, add=TRUE)
 landGp <- project(landG, crs(changeClassMaj))
 landGc <- crop(landGp, changeClassMaj)
 plot(landGc)
