@@ -36,6 +36,14 @@ plot(greenComp)
 
 wb <- vect("G:/My Drive/GIS/natural_earth/ne_10m_admin_0_countries")
 plot(wb)
+
+# greening trend data
+gr_all <- read.csv("G:/My Drive/research/projects/Kolyma/trends/landsat_ndvi_trends_1999to2020_n1000perClass.csv")
+
+gr_nib <-  read.csv("G:/My Drive/research/projects/Kolyma/trends/landsat_ndvi_trends_1999to2020_n100perClassNibbled.csv")
+
+
+
 ###### figure director ----
 dirSave <- "G:/My Drive/research/projects/Kolyma/manuscript/figures"
 ###### change maps and analysis ----
@@ -1393,9 +1401,30 @@ tableLC$Names <- c("NA",
                    "Taiga stable",
                    "Taiga gain")
 
-write.csv(tableLC, "E:/Kolyma/LC_class/class_id.csv", row.names=FALSE)
-writeRaster(changeClassLc,"E:/Kolyma/LC_class/landclass_LC.tif")
+# write.csv(tableLC, "E:/Kolyma/LC_class/class_id.csv", row.names=FALSE)
+# writeRaster(changeClassLc,"E:/Kolyma/LC_class/landclass_LC.tif")
 
 
 landcheck <- rast("E:/Kolyma/LC_class/landclass_LC.tif")
 plot(landcheck)
+
+gr_pts <- vect(gr_all, geom=c("longitude","latitude"),
+               crs="+proj=longlat +datum=WGS84")
+gr_ptsp <- project(gr_pts, crs(changeClassAgg))
+gr_perc <- terra::extract(changeClassAgg,gr_ptsp)
+
+all_trend <- cbind(gr_all,gr_perc)
+ggplot(all_trend, aes(as.factor(landcov.name), lyr.1))+
+  geom_boxplot()+
+  labs(x="landcover change", y="percent of pixel")
+
+
+gr_ptsn <- vect(gr_nib, geom=c("longitude","latitude"),
+               crs="+proj=longlat +datum=WGS84")
+gr_ptsnp <- project(gr_ptsn, crs(changeClassAgg))
+gr_percn <- terra::extract(changeClassAgg,gr_ptsnp)
+
+nib_trend <- cbind(gr_nib,gr_percn)
+ggplot(nib_trend, aes(as.factor(landcov.name), lyr.1))+
+  geom_boxplot()+
+  labs(x="landcover change", y="percent of pixel")
