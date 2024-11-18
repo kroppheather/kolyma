@@ -42,7 +42,7 @@ gr_all <- read.csv("G:/My Drive/research/projects/Kolyma/trends/landsat_ndvi_tre
 
 gr_nib <-  read.csv("G:/My Drive/research/projects/Kolyma/trends/landsat_ndvi_trends_1999to2020_n100perClassNibbled.csv")
 
-
+gr_time <-  read.csv("G:/My Drive/research/projects/Kolyma/trends/landsat_ndvi_max_timeseries_1999to2020_n1000perClass.csv")
 
 ###### figure director ----
 dirSave <- "G:/My Drive/research/projects/Kolyma/manuscript/figures"
@@ -612,7 +612,7 @@ plot(taigaChange, breaks=c(-0.5,0.5,1.5,2.5,3.5),col=colsChange,
      legend=FALSE,  axes=FALSE, mar=NA, maxcell=ncell(taigaChange))
 
 mtext("c", side=3, at=589000,  line=llc, cex=pcx)
-mtext("Taiga", side=3,   line=llcm, cex=mcx)
+mtext("Forest", side=3,   line=llcm, cex=mcx)
 
 
 par(mai=c(0.01,0.01,0.01,0.01))
@@ -833,7 +833,7 @@ mtext("50-100 m", side=1, at=4.5,line=2.75, cex=1.75)
 mtext(">100 m", side=1, at=7.5,line=2.75, cex=1.75)
 
 mtext("Proximity to surface water",side=1, line=4.5, cex=2)
-legend("topright", c("taiga", "shrub"),
+legend("topright", c("forest", "shrub"),
        fill=c(colsClass[2],colsClass[4]), bty="n", cex=1.75)
 
 dev.off()
@@ -979,7 +979,7 @@ mtext("d", side=3, at=597660,  line=llc, cex=pcx, col=pcc)
 
 par(mai=c(0.01,0.01,0.01,0.01))
 plot(c(0,10), c(0,10), type="n",xlab= " ", ylab=" ", axes=FALSE)
-legend("topleft", c("other", "taiga","water","shrub"),
+legend("topleft", c("other", "forest","water","shrub"),
        fill=colsClass, bty="n", cex=5)
 ### taiga gain
 # 1971 imagery
@@ -1255,7 +1255,7 @@ mtext("d", side=3, at=596920,  line=llc, cex=pcx, col=pcc)
 
 par(mai=c(0.01,0.01,0.01,0.01))
 plot(c(0,10), c(0,10), type="n",xlab= " ", ylab=" ", axes=FALSE)
-legend("topleft", c("other", "taiga","water","shrub"),
+legend("topleft", c("other", "forest","water","shrub"),
        fill=colsClass, bty="n", cex=5)
 ### taiga change to shrub
 # 1971 imagery
@@ -1323,6 +1323,9 @@ par(mai=c(0.01,0.01,0.01,0.01))
 plot(c(0,10), c(0,10), type="n",xlab= " ", ylab=" ", axes=FALSE)
 dev.off()
 
+
+
+########### Data org new greening/browning trend -----
 
 otherStable <- function(x,y,z){
   ifelse(x ==0 & y== 0 & z==0,1,0)
@@ -1404,6 +1407,7 @@ tableLC$Names <- c("NA",
 # write.csv(tableLC, "E:/Kolyma/LC_class/class_id.csv", row.names=FALSE)
 # writeRaster(changeClassLc,"E:/Kolyma/LC_class/landclass_LC.tif")
 
+# check proportional representation of modal class in each landsat pixel
 
 landcheck <- rast("E:/Kolyma/LC_class/landclass_LC.tif")
 plot(landcheck)
@@ -1428,3 +1432,227 @@ nib_trend <- cbind(gr_nib,gr_percn)
 ggplot(nib_trend, aes(as.factor(landcov.name), lyr.1))+
   geom_boxplot()+
   labs(x="landcover change", y="percent of pixel")
+
+
+head(gr_all)
+head(gr_time)
+
+ndvi_ave <- gr_time %>% 
+  group_by(landcov.name, sample.id) %>%
+  summarise(maxNDVI = mean(ndvi.max, na.rm=TRUE))
+
+# don't meet normality and variance assumptions
+qqnorm(ndvi_ave$maxNDVI[ndvi_ave$landcov.name == "Other stable"])
+qqline(ndvi_ave$maxNDVI[ndvi_ave$landcov.name == "Other stable"])
+
+qqnorm(ndvi_ave$maxNDVI[ndvi_ave$landcov.name == "Shrub stable"])
+qqline(ndvi_ave$maxNDVI[ndvi_ave$landcov.name == "Shrub stable"])
+
+qqnorm(ndvi_ave$maxNDVI[ndvi_ave$landcov.name == "Taiga stable"])
+qqline(ndvi_ave$maxNDVI[ndvi_ave$landcov.name == "Taiga stable"])
+
+qqnorm(ndvi_ave$maxNDVI[ndvi_ave$landcov.name == "Taiga gain"])
+qqline(ndvi_ave$maxNDVI[ndvi_ave$landcov.name == "Taiga gain"])
+
+qqnorm(ndvi_ave$maxNDVI[ndvi_ave$landcov.name == "Shrub gain"])
+qqline(ndvi_ave$maxNDVI[ndvi_ave$landcov.name == "Shrub gain"])
+bartlett.test(ndvi_ave$maxNDVI ~ as.factor(ndvi_ave$landcov.name))
+
+# run a kruskal wallace test
+
+kruskal.test(ndvi_ave$maxNDVI ~ as.factor(ndvi_ave$landcov.name))
+pairwise.wilcox.test(ndvi_ave$maxNDVI,as.factor(ndvi_ave$landcov.name),
+                     p.adjust.method = "bonferroni")
+
+
+# get the count and average for all land cover
+ndvi_land <- ndvi_ave %>%
+  group_by(landcov.name) %>%
+  summarise(ave_maxNDVI = mean(maxNDVI),
+            n_maxNDVI = n())
+
+# get landcover trend info
+
+gr_all$trend_type <- ifelse(gr_all$pval < 0.05 & gr_all$total.change.pcnt < 0, "browning",
+                            ifelse(gr_all$pval > 0.05, "no trend",
+                                   ifelse(gr_all$pval < 0.05 & gr_all$total.change.pcnt > 0, "greening", NA)))
+
+# organize data for graphs
+
+# greening/browning trends
+trend_count <- gr_all %>%
+  group_by(landcov.name, trend_type) %>%
+  summarise(count = n())
+lc_count <- gr_all %>%
+  group_by(landcov.name) %>%
+  summarise(lc_count = n())
+trend_counts <- left_join(trend_count, lc_count, by="landcov.name")
+trend_counts$percT <- round((trend_counts$count/trend_counts$lc_count)*100,1)
+
+greening_count <- trend_counts %>%
+  filter(trend_type == "greening")
+
+stable_count <- trend_counts %>%
+  filter(trend_type == "no trend")
+# average NDVI max by class
+change_names <- unique(ndvi_land$landcov.name)
+
+quantsMax <- list()
+for(i in 1:length(change_names)){
+  quantsMax[[i]] <- quantile(ndvi_ave$maxNDVI[ndvi_ave$landcov.name == change_names[i]],
+                             probs=c(0,0.25,0.5,0.75,1))
+}
+
+# greening percent change by change type
+
+# excluding browning because too small sample size
+greenChange <- gr_all %>%
+  filter(trend_type == "greening") %>%
+  group_by(landcov.name) %>%
+  summarise(medC = quantile(total.change.pcnt, probs=0.5),
+            lwC = quantile(total.change.pcnt, probs=0),
+            upC = quantile(total.change.pcnt, probs=1),
+           pc25 =  quantile(total.change.pcnt, probs=0.25),
+           pc75 =  quantile(total.change.pcnt, probs=0.75))
+
+stableChange <- gr_all %>%
+  filter(trend_type == "no trend") %>%
+  group_by(landcov.name) %>%
+  summarise(medC = quantile(total.change.pcnt, probs=0.5),
+            lwC = quantile(total.change.pcnt, probs=0),
+            upC = quantile(total.change.pcnt, probs=1),
+            pc25 =  quantile(total.change.pcnt, probs=0.25),
+            pc75 =  quantile(total.change.pcnt, probs=0.75))
+# make graphs
+
+
+
+
+
+wd1 <- 9
+hd1 <- 7
+
+
+png(paste0(dirSave, "/green_trend.png"), width=21, height=16, units="in", res=300)
+layout(matrix(seq(1,4),ncol=2, byrow=TRUE), width=lcm(c(wd1, wd1)*2.54),height=lcm(c(hd1, hd1)*2.54))
+# ndvi max in each class
+par(mai=c(1,1,1,1))
+plot(c(0,5), c(0.3, 1), ylim=c(0.3,1), xlim=c(0,6),
+     type="n", axes=FALSE, yaxs="i", xaxs="i",
+     xlab = " ", ylab= " ")
+
+for(i in 1:length(change_names)){
+  arrows(i, quantsMax[[i]][1], i, quantsMax[[i]][5], lwd=1.5, code=0)
+  polygon(c(i-0.25,i-0.25, i+0.25,i+0.25),
+          c( quantsMax[[i]][2],quantsMax[[i]][4],
+             quantsMax[[i]][4],quantsMax[[i]][2]),
+         col="white")
+  arrows(i-0.25, quantsMax[[i]][3], i+0.25,quantsMax[[i]][3], code=0, lwd=1.5)
+}
+graphics::text( seq(1,5),
+     rep(0.9,5),c("a", "b", "c", "d", "a"), cex=2.5)
+       
+
+                                     
+axis(1,c(-1,seq(1,5),8), c("","","","","","", ""),
+     cex.axis=2)
+mtext(c("Other","Shrub","shrub","Forest","Forest"),
+      at=seq(1,5), line=2, cex=2, side=1)
+mtext(c("stable","gain","stable","gain","stable"),
+      at=seq(1,5), line=4, cex=2, side=1)    
+axis(2, seq(0.3,1, by=0.1), las=2, cex.axis=3) 
+mtext( "average NDVI maximum (2000-2019, -)",side=2, line=5, cex=2.5)
+mtext( "Land cover change class",side=1, line=7, cex=2.5)
+text(0.2,0.98, "a", cex=3)
+
+
+# legend plot
+par(mai=c(0.5,0.5,0.5,0.5))
+plot(c(0,5), c(0.3, 1), ylim=c(0.3,1), xlim=c(0,6),
+     type="n", axes=FALSE, yaxs="i", xaxs="i",
+     xlab = " ", ylab= " ")
+
+legend("center",c("no change", "greening"), fill=c("grey75","darkgreen"),
+       bty="n", cex=3)
+# stacked barplot of trend count
+
+# trend count in each class
+par(mai=c(0.5,0.5,0.5,0.5))
+plot(c(0,5), c(0, 100), ylim=c(0,106), xlim=c(0,6),
+     type="n", axes=FALSE, yaxs="i", xaxs="i",
+     xlab = " ", ylab= " ")
+
+for(i in 1:length(change_names)){
+  polygon(c(i-0.25,i-0.25, i+0.25,i+0.25),
+          c(0,stable_count$percT[i],stable_count$percT[i],0),
+          col="grey75", border=NA)
+  
+  polygon(c(i-0.25,i-0.25, i+0.25,i+0.25),
+          c(stable_count$percT[i],
+            stable_count$percT[i]+greening_count$percT[i],
+            stable_count$percT[i]+greening_count$percT[i],
+            stable_count$percT[i]),
+          col="darkgreen", border=NA)
+}  
+text(seq(1,5),  stable_count$percT-10,
+     paste(stable_count$percT), cex=1.75)
+     
+text(seq(1,5),  stable_count$percT+10,
+     paste(greening_count$percT),col="white", cex=1.75)     
+
+axis(1,c(-1,seq(1,5), 8), c("", "","","","","", ""),
+     cex.axis=2)
+mtext(c("Other","Shrub","shrub","Forest","Forest"),
+      at=seq(1,5), line=2, cex=2, side=1)
+mtext(c("stable","gain","stable","gain","stable"),
+      at=seq(1,5), line=4, cex=2, side=1)    
+axis(2, seq(0,100, by=20), las=2, cex.axis=3) 
+mtext( "Percentage of class (%)",side=2, line=5, cex=2.5)
+mtext( "Land cover change class",side=1, line=7, cex=2.5)
+text(0.2,98, "b", cex=3)
+
+
+
+
+# trend count in each class
+xseq1 <- c(1,3,5,7,9)
+xseq2 <- c(2,4,6,8,10)
+          
+par(mai=c(0.5,0.5,0.5,0.5))
+plot(c(0,5), c(-25, 65), ylim=c(-25,65), xlim=c(0,12),
+     type="n", axes=FALSE, yaxs="i", xaxs="i",
+     xlab = " ", ylab= " ")
+
+
+for(i in 1:length(change_names)){
+  arrows(xseq1[i], stableChange$lwC[i], xseq1[i], stableChange$upC[i], lwd=1.5, code=0)
+  polygon(c(xseq1[i]-0.25,xseq1[i]-0.25, xseq1[i]+0.25,xseq1[i]+0.25),
+          c(  stableChange$pc25[i], stableChange$pc75[i],
+              stableChange$pc75[i], stableChange$pc25[i]),
+          col="grey75")
+  arrows(xseq1[i]-0.25, stableChange$medC[i], xseq1[i]+0.25,stableChange$medC[i], code=0, lwd=1.5)
+}
+
+for(i in 1:length(change_names)){
+  arrows(xseq2[i], greenChange$lwC[i], xseq2[i], greenChange$upC[i], lwd=1.5, code=0)
+  polygon(c(xseq2[i]-0.25,xseq2[i]-0.25, xseq2[i]+0.25,xseq2[i]+0.25),
+          c(  greenChange$pc25[i], greenChange$pc75[i],
+              greenChange$pc75[i], greenChange$pc25[i]),
+          col="darkgreen")
+  arrows(xseq2[i]-0.25,greenChange$medC[i], xseq2[i]+0.25,greenChange$medC[i], code=0, lwd=1.5)
+}
+
+
+
+axis(1,c(-1,1.5,3.5,5.5,7.5,9.5,15), c("", "","","","","", ""),
+     cex.axis=1.25)
+
+mtext(c("Other","Shrub","shrub","Forest","Forest"),
+      at=c(1.5,3.5,5.5,7.5,9.5), line=2, cex=2, side=1)
+mtext(c("stable","gain","stable","gain","stable"),
+      at=c(1.5,3.5,5.5,7.5,9.5), line=4, cex=2, side=1)
+axis(2, seq(-20,80, by=20), las=2, cex.axis=3) 
+mtext( "Percent change in NDVI maximum (%)",side=2, line=5, cex=2.5)
+mtext( "Land cover change class",side=1, line=7, cex=2.5)
+text(0.4,63, "c", cex=3)
+dev.off()
