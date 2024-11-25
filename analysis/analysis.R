@@ -551,7 +551,7 @@ axis(1, seq(1,4),labels=c("","","",""),
      cex.axis=cap, lwd.ticks=1.5, lwd=2)
 axis(2, seq(0,100, by=20), las=2, cex.axis= cap , lwd.ticks=1.5, lwd=2)
 mtext("Land cover type", side=1, line=5, cex=lax )
-mtext(c("Other","Taiga","Water","Shrub"), at=seq(1,4),side=1.5, cex=capl,
+mtext(c("Other","Forest","Water","Shrub"), at=seq(1,4),side=1.5, cex=capl,
       line=1)
 dev.off()
 
